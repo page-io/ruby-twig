@@ -1,5 +1,3 @@
-require 'nesty'
-
 require "twig/version"
 
 require 'twig/environment'

@@ -24,8 +24,6 @@ Gem::Specification.new do |s|
 
   s.require_path = "lib"
 
-  s.add_dependency 'nesty'
-
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec'
 end
