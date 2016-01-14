@@ -1,6 +1,10 @@
 module Tilt
   class TwigTemplate2 < Template
 
+    def self.loader= loader
+      @@loader = loader
+    end
+
     def prepare
       loader = Twig::Loader::Array.new({ file => data })
 
@@ -8,6 +12,11 @@ module Tilt
         loader = Twig::Loader::Chain.new([
           loader,
           Twig::Loader::Filesystem.new(options['paths'])
+        ])
+      elsif defined? @@loader
+        loader = Twig::Loader::Chain.new([
+          loader,
+          @@loader
         ])
       end
       @engine = Twig::Environment.new(loader)
