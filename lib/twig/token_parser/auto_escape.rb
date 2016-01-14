@@ -9,7 +9,7 @@ module Twig
       else
           expr = @parser.get_expression_parser.parse_expression;
           unless expr.is_a?(Twig::Node::Expression::Constant)
-            raise Twig::Error::Syntax.new('An escaping strategy must be a string or a bool.', stream.current_token.lineno, stream.get_filename);
+            raise Twig::Error::Syntax.new('An escaping strategy must be a string or a bool.', stream.current_token.lineno, stream.filename)
           end
           value = expr.get_attribute('value')
           compat = true == value || false == value
@@ -19,7 +19,7 @@ module Twig
           if compat && stream.check(:name_type)
             # @trigger_error('Using the autoescape tag with "true" or "false" before the strategy name is deprecated.', E_USER_DEPRECATED)
             unless value
-              raise Twig::Error::Syntax.new('Unexpected escaping strategy as you set autoescaping to false.', stream.current_token.lineno, stream.get_filename);
+              raise Twig::Error::Syntax.new('Unexpected escaping strategy as you set autoescaping to false.', stream.current_token.lineno, stream.filename)
             end
             value = stream.next.value
           end

@@ -30,7 +30,7 @@ module Twig
         when 'endif'.freeze
           _end = true
         else
-          raise Twig::Error::Syntax.new("Unexpected end of template. Twig was looking for the following tags \"else\", \"elseif\", or \"endif\" to close the \"if\" block started at line #{lineno}).", stream.current_token.lineno, stream.get_filename);
+          raise Twig::Error::Syntax.new("Unexpected end of template. Twig was looking for the following tags \"else\", \"elseif\", or \"endif\" to close the \"if\" block started at line #{lineno}).", stream.current_token.lineno, stream.filename)
         end
       end
       stream.expect(:block_end_type)

@@ -21,7 +21,7 @@ module Twig
       node = Twig::Node::Import.new(macro, Twig::Node::Expression::AssignName.new(@parser.get_var_name, token.lineno), token.lineno, tag)
       targets.each do |_name,_alias|
         if @parser.is_reserved_macro_name(_name)
-          raise Twig::Error::Syntax.new("\"#{_name}\" cannot be an imported macro as it is a reserved keyword.", token.lineno, stream.get_filename)
+          raise Twig::Error::Syntax.new("\"#{_name}\" cannot be an imported macro as it is a reserved keyword.", token.lineno, stream.filename)
         end
         @parser.add_imported_symbol('function', _alias, 'get'+_name, node.get_node('var'))
       end

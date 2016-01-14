@@ -147,7 +147,7 @@ module Twig
       #   return
       # end
       # r = ReflectionObject.new(template)
-      # file = r.get_filename
+      # file = r.filename
       # # hhvm has a bug where eval'ed files comes out as the current directory
       # if (is_dir(file))
       #     $file = ''

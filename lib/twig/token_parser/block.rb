@@ -6,7 +6,7 @@ module Twig
       stream = @parser.get_stream
       name = stream.expect(:name_type).value
       if @parser.has_block(name)
-       raise Twig::Error::Syntax.new("The block '#{name}' has already been defined line #{@parser.get_block(name).lineno}.", stream.current_token.lineno, stream.get_filename)
+       raise Twig::Error::Syntax.new("The block '#{name}' has already been defined line #{@parser.get_block(name).lineno}.", stream.current_token.lineno, stream.filename)
       end
       @parser.set_block(name, block = Twig::Node::Block.new(name, Twig::Node.new, lineno))
       @parser.push_local_scope
@@ -16,7 +16,7 @@ module Twig
         if token = stream.next_if(:name_type)
           value = token.value
           if value != name
-            raise Twig::Error::Syntax.new("Expected endblock for block \"#{name}\" (but \"#{value}\" given).", stream.current_token.lineno, stream.get_filename)
+            raise Twig::Error::Syntax.new("Expected endblock for block \"#{name}\" (but \"#{value}\" given).", stream.current_token.lineno, stream.filename)
           end
         end
       else

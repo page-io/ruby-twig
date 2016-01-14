@@ -1,6 +1,8 @@
 module Twig
   class TokenStream
 
+    attr_reader :filename
+
     # Constructor.
     #
     # @param array  tokens   An array of tokens
@@ -93,11 +95,5 @@ module Twig
       @tokens[@current]
     end
 
-    # Gets the filename associated with this stream.
-    #
-    # @return string
-    def get_filename
-      @filename
-    end
   end
 end

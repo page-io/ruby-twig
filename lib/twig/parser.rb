@@ -5,7 +5,7 @@ module Twig
 
     # Constructor.
     #
-    # @param Twig_Environment $env A Twig_Environment instance
+    # @param env [Twig::Environment] A Twig::Environment instance
     def initialize(env)
       @env = env
       @stack = []
@@ -32,8 +32,8 @@ module Twig
       "__internal_#{SecureRandom.uuid.hash}" #TODO! check this!
     end
 
-    def get_filename
-      @stream.get_filename
+    def filename
+      @stream.filename
     end
 
     # {@inheritdoc}
@@ -69,7 +69,7 @@ module Twig
         end
       rescue Twig::Error::Syntax => ex
         if !ex.get_template_file
-          ex.set_template_file(get_filename)
+          ex.set_template_file(filename)
         end
         if !ex.get_template_line
           ex.set_template_line(@stream.current_token.lineno)
@@ -77,7 +77,7 @@ module Twig
         raise ex
       end
 
-      node = Twig::Node::Module.new(Twig::Node::Body.new([body]), @parent, Twig::Node.new(@blocks), Twig::Node.new(@macros), Twig::Node.new(@traits), @embedded_templates, get_filename)
+      node = Twig::Node::Module.new(Twig::Node::Body.new([body]), @parent, Twig::Node.new(@blocks), Twig::Node.new(@macros), Twig::Node.new(@traits), @embedded_templates, filename)
       traverser = Twig::NodeTraverser.new(@env, @visitors)
       node = traverser.traverse(node)
 
@@ -113,7 +113,7 @@ module Twig
           @stream.next
           token = current_token
           if token.type != :name_type
-            raise Twig::Error::Syntax.new('A block must start with a tag name.', token.lineno, @get_filename)
+            raise Twig::Error::Syntax.new('A block must start with a tag name.', token.lineno, filename)
           end
           if !_test.nil? && _test[0].send(_test[1].to_sym, token)
             if drop_needle
@@ -127,12 +127,12 @@ module Twig
           subparser = @handlers.get_token_parser(token.value)
           if subparser.nil?
             if !_test.nil?
-              ex = Twig::Error::Syntax.new("Unexpected \"#{token.value()}\" tag", token.lineno, get_filename)
+              ex = Twig::Error::Syntax.new("Unexpected \"#{token.value()}\" tag", token.lineno, filename)
               if _test.is_a?(::Array) && _test.length > 0 && _test[0].is_a?(Twig::TokenParser)
                 ex.append_message(" (expecting closing tag for the \"#{_test[0].tag}\" tag defined near line #{lineno}).")
               end
             else
-              ex = Twig::Error::Syntax.new("Unknown \"#{token.value}\" tag.", token.lineno, get_filename)
+              ex = Twig::Error::Syntax.new("Unknown \"#{token.value}\" tag.", token.lineno, filename)
               ex.add_suggestions(token.value, @env.get_tags.keys)
             end
             raise ex
@@ -143,7 +143,7 @@ module Twig
             rv << node
           end
         else
-          raise Twig::Error::Syntax.new('Lexer or parser ended up in unsupported state.', 0, get_filename);
+          raise Twig::Error::Syntax.new('Lexer or parser ended up in unsupported state.', 0, filename)
         end
       end
       if rv.count ==  1
@@ -194,7 +194,7 @@ module Twig
 
     def set_macro(name, node)
       if is_reserved_macro_name(name)
-        raise Twig::Error::Syntax.new("\"#{name}\" cannot be used as a macro name as it is a reserved keyword.", node.lineno, get_filename)
+        raise Twig::Error::Syntax.new("\"#{name}\" cannot be used as a macro name as it is a reserved keyword.", node.lineno, filename)
       end
       @macros[name] = node
     end
@@ -284,7 +284,7 @@ module Twig
         (node.is_a?(Twig::Node::Text) && !(node.get_attribute('data') =~ /\A[\s]+\z/)) ||
         (!node.is_a?(Twig::Node::Text) && !node.is_a?(Twig::Node::BlockReference) && node.is_a?(Twig::Node::Output))
       )
-        raise Twig::Error::Syntax.new('A template that extends another one cannot have a body.', node.lineno, get_filename)
+        raise Twig::Error::Syntax.new('A template that extends another one cannot have a body.', node.lineno, filename)
       end
       # bypass "set" nodes as they "capture" the output
       if node.is_a?(Twig::Node::Set)

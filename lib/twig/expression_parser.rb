@@ -110,7 +110,7 @@ module Twig
           neg_class = 'Twig::Node::Expression::Unary::Neg'
           pos_class = 'Twig::Node::Expression::Unary::Pos'
           unless [neg_class, pos_class].include?(ref.get_name) || ref.is_subclass_of(neg_class) || ref.is_subclass_of(pos_class)
-            raise Twig::Error::Syntax.new("Unexpected unary operator \"#{token.value}\".", token.lineno, @parser.get_filename)
+            raise Twig::Error::Syntax.new("Unexpected unary operator \"#{token.value}\".", token.lineno, @parser.filename)
           end
           @parser.get_stream.next
           expr = parse_primary_expression
@@ -122,7 +122,7 @@ module Twig
         elsif token.check(:punctuation_type, '{')
           node = parse_hash_expression
         else
-          Twig::Error::Syntax.new("Unexpected token \"#{Twig::Token.type_to_english(token.type)}\" of value \"#{token.value}\".", token.lineno, @parser.get_filename)
+          Twig::Error::Syntax.new("Unexpected token \"#{Twig::Token.type_to_english(token.type)}\" of value \"#{token.value}\".", token.lineno, @parser.filename)
         end
       end
       parse_postfix_expression(node)
@@ -198,7 +198,7 @@ module Twig
           key = parse_expression
         else
           current = stream.current_token
-          raise Twig::Error::Syntax.new("A hash key must be a quoted string, a number, a name, or an expression enclosed in parentheses (unexpected token \"#{Twig::Token.type_to_english(current.type)}\" of value \"#{current.value}\".", current.lineno, @parser.get_filename)
+          raise Twig::Error::Syntax.new("A hash key must be a quoted string, a number, a name, or an expression enclosed in parentheses (unexpected token \"#{Twig::Token.type_to_english(current.type)}\" of value \"#{current.value}\".", current.lineno, @parser.filename)
         end
         stream.expect(:punctuation_type, ':', 'A hash key must be followed by a colon (:)')
         value = parse_expression
@@ -231,10 +231,10 @@ module Twig
       when 'parent'
         parse_arguments
         unless @parser.get_block_stack
-          raise Twig::Error::Syntax.new('Calling "parent" outside a block is forbidden.', line, @parser.get_filename)
+          raise Twig::Error::Syntax.new('Calling "parent" outside a block is forbidden.', line, @parser.filename)
         end
         if !@parser.get_parent && !@parser.has_traits
-          raise Twig::Error::Syntax.new('Calling "parent" on a template that does not extend nor "use" another template is forbidden.', line, @parser.get_filename)
+          raise Twig::Error::Syntax.new('Calling "parent" on a template that does not extend nor "use" another template is forbidden.', line, @parser.filename)
         end
         return Twig::Node::Expression::Parent.new(@parser.peek_block_stack, line)
       when 'block'
@@ -242,7 +242,7 @@ module Twig
       when 'attribute'
         args = parse_arguments
         if args.length < 2
-          raise Twig::Error::Syntax.new('The "attribute" function takes at least two arguments (the variable and the attributes).', line, @parser.get_filename)
+          raise Twig::Error::Syntax.new('The "attribute" function takes at least two arguments (the variable and the attributes).', line, @parser.filename)
         end
         return Twig::Node::Expression::GetAttr.new(args.nodes[0], args.nodes[1], args.length > 2 ? args.get_node(2) : nil, :any_call, line)
       else
@@ -281,15 +281,15 @@ module Twig
             end
           end
         else
-          raise Twig::Error::Syntax.new('Expected name or number', lineno, @parser.get_filename)
+          raise Twig::Error::Syntax.new('Expected name or number', lineno, @parser.filename)
         end
         if node.is_a?(Twig::Node::Expression::Name) && !@parser.get_imported_symbol('template', node.get_attribute('name')).nil?
           unless arg.is_a?(Twig::Node::Expression::Constant)
-            raise Twig::Error::Syntax.new("Dynamic macro names are not supported (called on \"#{node.get_attribute('name')}\").", token.lineno, @parser.get_filename)
+            raise Twig::Error::Syntax.new("Dynamic macro names are not supported (called on \"#{node.get_attribute('name')}\").", token.lineno, @parser.filename)
           end
           name = arg.get_attribute('value')
           if @parser.is_reserved_macro_name(name)
-            raise Twig::Error::Syntax.new("\"#{name}\" cannot be called as macro as it is a reserved keyword.", token.lineno, @parser.get_filename)
+            raise Twig::Error::Syntax.new("\"#{name}\" cannot be called as macro as it is a reserved keyword.", token.lineno, @parser.filename)
           end
           node = Twig::Node::Expression::MethodCall.new(node, 'get'.name, arguments, lineno)
           node.set_attribute(:safe, true)
@@ -374,13 +374,13 @@ module Twig
         name = nil
         if (named_arguments && token = stream.next_if(:operator_type, '='))
           unless value.is_a?(Twig::Node::Expression::Name)
-            raise Twig::Error::Syntax.new("A parameter name must be a string, \"#{value.class.name}\" given.", token.lineno, @parser.get_filename)
+            raise Twig::Error::Syntax.new("A parameter name must be a string, \"#{value.class.name}\" given.", token.lineno, @parser.filename)
           end
           name = value.get_attribute('name')
           if definition
             value = parse_primary_expression
             unless check_constant_expression(value)
-              raise Twig::Error::Syntax.new("A default value for an argument must be a constant (a boolean, a string, a number, or an array).", token.lineno, @parser.get_filename)
+              raise Twig::Error::Syntax.new("A default value for an argument must be a constant (a boolean, a string, a number, or an array).", token.lineno, @parser.filename)
             end
           else
             value = parse_expression
@@ -409,7 +409,7 @@ module Twig
       while true
         token = @parser.get_stream.expect(:name_type, nil, 'Only variables can be assigned to')
         if ['true', 'false', 'none'].include?(token.value)
-          raise Twig::Error::Syntax.new("You cannot assign a value to \"#{token.value}\".", token.lineno, @parser.get_filename)
+          raise Twig::Error::Syntax.new("You cannot assign a value to \"#{token.value}\".", token.lineno, @parser.filename)
         end
         targets << Twig::Node::Expression::AssignName.new(token.value, token.lineno)
         unless @parser.get_stream.next_if(:punctuation_type, ',')
@@ -430,7 +430,7 @@ module Twig
     def get_function_node_class(name, line)
       env = @parser.environment
       unless (function = env.get_function(name))
-        ex = Twig::Error::Syntax.new("Unknown \"#{name}\" function.", line, @parser.get_filename)
+        ex = Twig::Error::Syntax.new("Unknown \"#{name}\" function.", line, @parser.filename)
         ex.add_suggestions(name, env.get_functions.keys)
         raise ex
       end
@@ -440,7 +440,7 @@ module Twig
           if function.get_alternative
             message << ". Use \"#{function.get_alternative}\" instead"
           end
-          message << " in \"#{@parser.get_filename}\" at line #{line}."
+          message << " in \"#{@parser.filename}\" at line #{line}."
           warn message
         end
         return function.get_node_class
@@ -451,7 +451,7 @@ module Twig
     def get_filter_node_class(name, line)
       env = @parser.environment
       if !(filter = env.get_filter(name))
-        ex = Twig::Error::Syntax.new("Unknown \"#{name}\" filter.", line, @parser.get_filename)
+        ex = Twig::Error::Syntax.new("Unknown \"#{name}\" filter.", line, @parser.filename)
         ex.add_suggestions(name, env.get_filters.keys)
         raise ex
       end
@@ -460,7 +460,7 @@ module Twig
         if filter.get_alternative
           message << ". Use \"#{filter.get_alternative}\" instead"
         end
-        message << " in #{@parser.get_filename} at line #{line}."
+        message << " in #{@parser.filename} at line #{line}."
         # @trigger_error(message, E_USER_DEPRECATED)
       end
       if filter.is_a?(Twig::SimpleFilter)

@@ -48,7 +48,7 @@ module Twig
     # the loop variable cannot be used in the condition
     def check_loop_usage_condition(stream, node)
       if node.is_a?(Twig::Node::Expression::GetAttr) && node.get_node('node').is_a?(Twig::Node::Expression::Name) && 'loop' == node.get_node('node').get_attribute('name')
-        raise Twig::Error::Syntax.new('The "loop" variable cannot be used in a looping condition.', node.lineno, stream.get_filename)
+        raise Twig::Error::Syntax.new('The "loop" variable cannot be used in a looping condition.', node.lineno, stream.filename)
       end
       node.each do |n|
         if n
@@ -63,7 +63,7 @@ module Twig
       if node.is_a?(Twig::Node::Expression::GetAttr) && node.get_node('node').is_a?(Twig::Node::Expression::Name) && 'loop' == node.get_node('node').get_attribute('name')
         attribute = node.get_node('attribute');
         if attribute.is_a?(Twig::Node::Expression::Constant) && ['length', 'revindex0', 'revindex', 'last'].include?(attribute.get_attribute('value'))
-          raise Twig::Error::Syntax.new("The \"loop.#{attribute.get_attribute('value')}\" variable is not defined when looping with a condition.", node.lineno, stream.get_filename)
+          raise Twig::Error::Syntax.new("The \"loop.#{attribute.get_attribute('value')}\" variable is not defined when looping with a condition.", node.lineno, stream.filename)
         end
       end
       # should check for parent.loop.XXX usage

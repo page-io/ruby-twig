@@ -4,7 +4,7 @@ module Twig
       template = @parser.get_expression_parser.parse_expression
       stream = @parser.get_stream
       if !template.is_a?(Twig::Node::Expression::Constant)
-        raise Twig::Error::Syntax.new('The template references in a "use" statement must be a string.', stream.current_token.lineno, stream.get_filename);
+        raise Twig::Error::Syntax.new('The template references in a "use" statement must be a string.', stream.current_token.lineno, stream.filename)
       end
       targets = []
       if stream.next_if('with'.freeze)

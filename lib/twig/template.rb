@@ -253,7 +253,7 @@ module Twig
     def get_source
       raise 'check this!'
         # _reflector = new ReflectionClass($this);
-        # $file = _reflector.get_filename;
+        # $file = _reflector.filename;
         # if (!file_exists($file)) {
         #     return;
         # end

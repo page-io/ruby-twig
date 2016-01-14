@@ -12,7 +12,7 @@ module Twig
       if (token = stream.next_if(:name_type))
         value = token.value
         if (value != name)
-          raise Twig::Error::Syntax.new("Expected endmacro for macro \"#{name}\" (but \"#{value}\" given).", stream.current_token.lineno, stream.get_filename)
+          raise Twig::Error::Syntax.new("Expected endmacro for macro \"#{name}\" (but \"#{value}\" given).", stream.current_token.lineno, stream.filename)
         end
       end
       @parser.pop_local_scope

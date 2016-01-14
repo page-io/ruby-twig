@@ -232,7 +232,7 @@ module Twig
           if test.get_alternative
             message.concat ". Use \"#{test.get_alternative}\" instead"
           end
-          message.concat " in #{stream.get_filename} at line #{stream.current_token.lineno}."
+          message.concat " in #{stream.filename} at line #{stream.current_token.lineno}."
           # @trigger_error(message, E_USER_DEPRECATED)
         end
         klass = get_test_node_class(parser, test)
@@ -258,7 +258,7 @@ module Twig
             return [name, test]
           end
         end
-        ex = Twig::Error::Syntax.new("Unknown \"#{name}\" test.", line, parser.get_filename);
+        ex = Twig::Error::Syntax.new("Unknown \"#{name}\" test.", line, parser.filename);
         ex.add_suggestions(name, env.get_tests.keys)
         raise ex
       end

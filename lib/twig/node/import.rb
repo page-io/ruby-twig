@@ -19,7 +19,7 @@ module Twig
           .raw('load_template(')
           .subcompile(get_node(:expr))
           .raw(', ')
-          .repr(compiler.get_filename)
+          .repr(compiler.filename)
           .raw(', ')
           .repr(lineno)
           .raw(')')

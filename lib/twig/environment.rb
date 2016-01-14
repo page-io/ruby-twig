@@ -332,7 +332,7 @@ module Twig
       # if (0 == @last_modified_extension)
       #   @extensions.each do |extension|
       #     r = ReflectionObject.new(extension)
-      #     if (file_exists(r.get_filename) && (extensionTime = filemtime(r.get_filename)) > @last_modified_extension)
+      #     if (file_exists(r.filename) && (extensionTime = filemtime(r.filename)) > @last_modified_extension)
       #         @last_modified_extension = extensionTime
       #     end
       #   end

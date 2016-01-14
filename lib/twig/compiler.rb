@@ -3,15 +3,13 @@ module Twig
   # Compiles a node.
   class Compiler
 
+    attr_reader :filename
+
     # Constructor.
     #
     # @param Twig::Environment env The twig environment instance
     def initialize(env)
       @env = env
-    end
-
-    def get_filename
-      @filename
     end
 
     # Returns the environment instance related to this compiler.
@@ -67,7 +65,7 @@ module Twig
     #
     # @return Twig::Compiler The current compiler instance
     def raw(string)
-      @source.concat string
+      @source << string
       self
     end
 
@@ -77,7 +75,7 @@ module Twig
     def write *strings
       strings.each do |string|
         add_indentation
-        @source.concat string
+        @source << string
       end
 
       self
@@ -87,7 +85,7 @@ module Twig
     #
     # @return Twig::Compiler The current compiler instance
     def add_indentation
-      @source.concat (' ' * (@indentation * 2))
+      @source << (' ' * (@indentation * 2))
       self
     end
 
@@ -97,7 +95,7 @@ module Twig
     #
     # @return Twig::Compiler The current compiler instance
     def string(value)
-      @source.concat value.inspect
+      @source << value.inspect
       self
     end
 

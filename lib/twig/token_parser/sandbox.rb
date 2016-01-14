@@ -12,7 +12,7 @@ module Twig
             continue
           end
           unless node.is_a?(Twig::Node::Include)
-            raise Twig::Error::Syntax.new('Only "include" tags are allowed within a "sandbox" section.', node.lineno, @parser.get_filename)
+            raise Twig::Error::Syntax.new('Only "include" tags are allowed within a "sandbox" section.', node.lineno, @parser.filename)
           end
         end
       end

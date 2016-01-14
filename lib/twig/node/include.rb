@@ -20,7 +20,7 @@ module Twig
 
       add_template_arguments(compiler)
 
-      compiler.raw(")\n");
+      compiler.raw(")\n")
 
       if get_attribute(:ignore_missing)
         compiler
@@ -38,7 +38,7 @@ module Twig
         .write('_twigout << load_template(')
         .subcompile(get_node(:expr))
         .raw(',')
-        .repr(compiler.get_filename)
+        .repr(compiler.filename)
         .raw(',')
         .repr(lineno)
         .raw(')')

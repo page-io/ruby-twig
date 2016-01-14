@@ -12,7 +12,7 @@ module Twig
         write('load_template(').
         string(get_attribute('filename')).
         raw(', ').
-        repr(compiler.get_filename).
+        repr(compiler.filename).
         raw(', ').
         repr(lineno).
         raw(', ').
