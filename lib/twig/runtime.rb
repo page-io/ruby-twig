@@ -78,12 +78,12 @@ module Twig
       'w' => '%w', #	Numeric representation of the day of the week	0 (for Sunday) through 6 (for Saturday)
       'z' => '%!z', #	The day of the year (starting from 0)	0 through 365
       # Week
-      'W' => '%U', #	ISO-8601 week number of year, weeks starting on Monday (added in PHP 4.1.0)	Example: 42 (the 42nd week in the year)
+      'W' => '%V', #	ISO-8601 week number of year, weeks starting on Monday (added in PHP 4.1.0)	Example: 42 (the 42nd week in the year)
       # Month
       'F' => '%B', #	A full textual representation of a month, such as January or March	January through December
       'm' => '%m', #	Numeric representation of a month, with leading zeros	01 through 12
       'M' => '%b', #	A short textual representation of a month, three letters	Jan through Dec
-      'n' => '%-d', #	Numeric representation of a month, without leading zeros	1 through 12
+      'n' => '%-m', #	Numeric representation of a month, without leading zeros	1 through 12
       't' => '%!t', #	Number of days in the given month	28 through 31
       # Year	---	---
       'L' => '%!L', #	Whether it's a leap year	1 if it is a leap year, 0 otherwise.
