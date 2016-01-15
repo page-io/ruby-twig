@@ -260,25 +260,24 @@ module Twig
     #  be used.  Supplying any of the parameters will override the defaults set in the
     #  environment object.
     #
-    #  @param Twig_Environment env          A Twig_Environment instance
-    #  @param mixed            number       A float/int/string of the number to format
-    #  @param int              decimal      The number of decimal points to display.
-    #  @param string           decimal_point The character(s) to use for the decimal point.
-    #  @param string           thousand_sep  The character(s) to use for the thousands separator.
+    #  @param env [Twig::Environment]       A Twig::Environment instance
+    #  @param number mixed                  A float/int/string of the number to format
+    #  @param decimal [Integer]             The number of decimal points to display.
+    #  @param decimal_point [String]        The character(s) to use for the decimal point.
+    #  @param thousand_sep [String]         The character(s) to use for the thousands separator.
     #
     #  @return string The formatted number
     def self.twig_number_format_filter(env, number, decimal = nil, decimal_point = nil, thousand_sep = nil)
+      require 'active_support'
+      require 'active_support/core_ext/numeric/conversions'
+
       defaults = env.get_extension('core').get_number_format
-      if (nil == decimal)
-        decimal = defaults[0]
-      end
-      if (nil == decimal_point)
-        decimal_point = defaults[1]
-      end
-      if (nil == thousand_sep)
-        thousand_sep = defaults[2]
-      end
-      number_format(number.to_f, decimal, decimal_point, thousand_sep)
+
+      decimal ||= defaults[:decimal]
+      decimal_point ||= defaults[:decimal_point]
+      thousand_sep ||= defaults[:thousand_separator]
+
+      number.to_f.to_s(:delimited, separator: decimal_point, delimiter: thousand_sep)
     end
 
     #  URL encodes (RFC 3986) a string as a path segment or an array as a query string.

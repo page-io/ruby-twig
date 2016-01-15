@@ -38,7 +38,7 @@ module Twig
       # @param string|array paths     A path or an array of paths where to look for templates
       # @param string       namespace A path namespace
       def set_paths(paths, namespace = MAIN_NAMESPACE)
-        if !paths.is_a?(::Array)
+        unless paths.is_a?(::Array)
           paths = [paths]
         end
         @paths[namespace] = []
@@ -56,43 +56,40 @@ module Twig
       def add_path(path, namespace = MAIN_NAMESPACE)
         # invalidate the cache
         @cache = @error_cache = {}
-        if !Dir.exist?(path)
+        unless Dir.exist?(path)
           raise Twig::Error::Loader.new("The \"#{path}\" directory does not exist.")
         end
         @paths[namespace] << Pathname.new(path).realpath.to_s
       end
 
-      # Prepends a path where templates are stored.
-      #
-      # @param string path      A path where to look for templates
-      # @param string namespace A path name
-      #
-      # raise Twig::Error::Loader
-      def prepend_path(path, namespace = MAIN_NAMESPACE)
-        # invalidate the cache
-        @cache = @error_cache = []
-        if !Dir.exist?(path)
-          raise Twig::Error::Loader.new("The \"#{path}\" directory does not exist.")
-        end
-        path = rtrim(path, '/\\')
-        if (!isset(@paths[namespace]))
-            @paths[namespace][] = path
-        else
-            array_unshift(@paths[namespace], path)
-        end
-      end
+      # # Prepends a path where templates are stored.
+      # #
+      # # @param string path      A path where to look for templates
+      # # @param string namespace A path name
+      # #
+      # # raise Twig::Error::Loader
+      # def prepend_path(path, namespace = MAIN_NAMESPACE)
+      #   # invalidate the cache
+      #   @cache = @error_cache = []
+      #   unless Dir.exist?(path)
+      #     raise Twig::Error::Loader.new("The \"#{path}\" directory does not exist.")
+      #   end
+      #   path = rtrim(path, '/\\')
+      #   if (!isset(@paths[namespace]))
+      #       @paths[namespace][] = path
+      #   else
+      #       array_unshift(@paths[namespace], path)
+      #   end
+      # end
 
-      # {@inheritdoc}
       def get_source(name)
         File.read(find_template(name))
       end
 
-      # {@inheritdoc}
       def get_cache_key(name)
         find_template(name)
       end
 
-      # {@inheritdoc}
       def exists(name)
         name = normalize_name(name)
         if @cache.key?(name)
@@ -105,7 +102,6 @@ module Twig
         end
       end
 
-      # {@inheritdoc}
       def is_fresh(name, time)
         File.mtime(find_template(name)) <= time
       end
@@ -116,24 +112,24 @@ module Twig
           return @cache[name]
         end
         if @error_cache.key?(name)
-          if !raise_error
+          unless raise_error
             return false
           end
           raise Twig::Error::Loader.new(@error_cache[name])
         end
         validate_name(name)
         namespace, shortname = parse_name(name)
-        if !@paths.key?(namespace)
+        unless @paths.key?(namespace)
           @error_cache[name] = "There are no registered paths for namespace \"#{namespace}\"."
-          if !raise_error
+          unless raise_error
             return false
           end
           raise Twig::Error::Loader.new(@error_cache[name])
         end
         @paths[namespace].each do |path|
-          if File.exist?(path+'/'+shortname)
-            realpath = Pathname.new(path).join(shortname).realpath.to_s
-            return @cache[name] = realpath
+          full_path = Pathname.new(path).join(shortname)
+          if full_path.file?
+            return @cache[name] = full_path.realpath.to_s
           end
         end
         @error_cache[name] = "Unable to find template \"#{name}\" (looked into: #{@paths[namespace].join(', ')})."
@@ -144,7 +140,7 @@ module Twig
 
       def parse_name(name, default = MAIN_NAMESPACE)
         if '@' == name[0]
-          if !name.match(/\A@(.+?)\/(.*)/)
+          unless name.match(/\A@(.+?)\/(.*)/)
             raise Twig::Error::Loader.new "Malformed namespaced template name \"%#{name}\" (expecting \"@namespace/template_name\")."
           end
           return [$1, $2]

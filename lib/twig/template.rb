@@ -14,10 +14,12 @@ module Twig
       @traits = {}
     end
 
-    # # Returns the template name.
-    # #
-    # # @return string The template name
-    # abstract public function getTemplateName();
+    # Returns the template name.
+    #
+    # @return string The template name
+    def get_template_name
+      raise NotImplementedError.new("#{self.class.name}#area is an abstract method.")
+    end
 
     # # @deprecated since 1.20 (to be removed in 2.0)
     # def getEnvironment()

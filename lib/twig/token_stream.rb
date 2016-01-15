@@ -85,7 +85,7 @@ module Twig
     #
     # @return bool
     def eos?
-      @current >= @tokens.length || current_token.type == :eof_type
+      @current >= @tokens.length # || current_token.type == :eof_type
     end
 
     # Gets the current token.

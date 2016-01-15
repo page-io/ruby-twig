@@ -9,9 +9,9 @@ module Twig
   class Node::Expression::Test::Null < Twig::Node::Expression::Test
     def compile(compiler)
       compiler
-        .raw('(nil == ')
+        .raw('(')
         .subcompile(get_node('node'))
-        .raw(')')
+        .raw(').nil?')
     end
   end
 end

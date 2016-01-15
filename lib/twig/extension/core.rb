@@ -7,9 +7,13 @@ module Twig
         @date_formats = 'F j, Y H:i'
         @date_interval_format = '%d days'
 
-        # @numberFormat = [0, '.', ',']
+        @number_format = {
+          decimal: 0,
+          decimal_point: '.',
+          thousand_separator: ','
+        }
         # @timezone = nil
-        # @escapers = []
+        @escapers = []
       end
 
       #  Defines a new escaper to be used via the escape filter.
@@ -82,10 +86,10 @@ module Twig
 
       #  Get the default format used by the number_format filter.
       #
-      #  @return array The arguments for number_format()
-      # def getNumberFormat()
-      #     return $this->numberFormat;
-      # end
+      #  @return The arguments for number_format
+      def get_number_format
+        @number_format
+      end
 
       def get_token_parsers
         [

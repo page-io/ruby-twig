@@ -61,7 +61,7 @@ module Twig
         end
       end
 
-      push_token(:eof_type)
+      # push_token(:eof_type)
       if @brackets.any?
         expect, lineno = @brackets.pop
         raise Twig::Error::Syntax.new("Unclosed \"#{expect}\" at line #{lineno}.", lineno, @filename)
@@ -241,7 +241,7 @@ module Twig
 
     protected
 
-      def push_token(type, value = '')
+      def push_token(type, value = nil)
         # do not push empty text tokens
         if (type == :text_type && '' == value)
           return

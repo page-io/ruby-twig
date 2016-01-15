@@ -12,7 +12,7 @@ module Twig
       compiler
         .raw('(')
         .subcompile(get_node('node'))
-        .raw(' == constant(')
+        .raw(' == Twig::Runtime.twig_constant(')
 
       if get_node('arguments').nodes[1]
         compiler

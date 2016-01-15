@@ -356,9 +356,8 @@ module Twig
         names = [names]
       end
       names.each do |name|
-        if name.is_a?(Twig::Template)
-          return name
-        end
+        next if name.nil?
+        return name if name.is_a?(Twig::Template)
         begin
           return load_template(name)
         rescue Twig::Error::Loader

@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gemspec
-gem 'stackprof', platforms: :mri_21
+# gem 'stackprof', platforms: :mri_21
 
 gem 'tilt', group: [:test, :development]
 

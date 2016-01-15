@@ -6,9 +6,7 @@ module Twig
     end
 
     def compile(compiler)
-      compiler
-        .add_debug_info(self)
-        .write("flush();\n")
+      # not suported
     end
 
   end
