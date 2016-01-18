@@ -42,9 +42,9 @@ module Twig
         if get_attribute(:capture)
           compiler.raw(" = begin\n")
             .indent
-            .write("_twigout = ''\n")
+            .write("_twigout = []\n")
             .subcompile(get_node('values'))
-            .write("_twigout\n")
+            .write("_twigout.join\n")
             .outdent
             .write("end\n")
         end

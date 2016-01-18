@@ -13,17 +13,6 @@ module Twig
       @current = 0
     end
 
-    # # Returns a string representation of the token stream.
-    # #
-    # # @return string
-    # def __toString()
-    #   implode("\n", @tokens);
-    # end
-
-    # def injectTokens(array tokens)
-    #     @tokens = array_merge(array_slice(@tokens, 0, @current), tokens, array_slice(@tokens, @current));
-    # end
-
     # Sets the pointer to the next token and returns the old one.
     #
     # @return Twig::Token
@@ -53,7 +42,7 @@ module Twig
         line = token.lineno
         message = message ? "#{message}. " : ''
         value = value ? " with value \"#{value}\"" : ''
-        raise Twig::Error::Syntax.new("#{message}Unexpected token \"#{Twig::Token.type_to_english(token.type)}\" of value \"#{token.value}\" (\"#{Twig::Token.type_to_english(type)}\" expected#{value}). File: #{@filename}, at line: #{line + 1}.",
+        raise Twig::Error::Syntax.new("#{message}Unexpected token \"#{Twig::Token.type_to_english(token.type)}\" of value \"#{token.value}\" (\"#{Twig::Token.type_to_english(type)}\" expected#{value}).",
           line,
           @filename
         )

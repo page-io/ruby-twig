@@ -277,17 +277,11 @@ module Twig
 
     # {@inheritdoc}
     def render(context)
-      # $level = ob_get_level();
-      # ob_start();
-      begin
+      # begin
         display(context)
-      # rescue => ex
-      #     while (ob_get_level() > $level) {
-      #         ob_end_clean();
-      #     end
-      #     raise $e;
-      end
-      # return ob_get_clean();
+      # rescue
+      #   raise
+      # end
     end
 
     def display_with_error_handling(context, blocks = [])

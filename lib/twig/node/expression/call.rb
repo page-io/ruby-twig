@@ -11,7 +11,7 @@ module Twig
           compiler.raw("@env.get_extension(\'#{callable[0].get_name}\').#{callable[1]}")
         else
           type = get_attribute(:type)
-          compiler.raw("call_user_func_array(@env.get#{type}(\'#{get_attribute('name')}\').get_callable(), array")
+          compiler.raw("call_user_func_array(@env.get#{type}(\'#{get_attribute('name')}\').get_callable(), ")
           needs_closing_parenthesis = true
         end
       else
@@ -26,7 +26,7 @@ module Twig
     end
 
     def compile_arguments(compiler)
-      compiler.raw('(')
+      compiler.raw('[')
 
       first = true
 
@@ -72,7 +72,7 @@ module Twig
         end
       end
 
-      compiler.raw(')')
+      compiler.raw(']')
     end
 
     #
@@ -85,9 +85,6 @@ module Twig
       parameters = {}
       named = false
 
-puts 'arguments:'
-pp arguments
-
       arguments.nodes.each do |name, node|
         if !name.is_a?(Integer)
           named = true
@@ -99,15 +96,12 @@ pp arguments
         parameters[name] = node
       end
 
-puts 'parameters:'
-pp parameters
-
       is_variadic = has_attribute(:is_variadic) && get_attribute(:is_variadic)
       if !named && !is_variadic
         return parameters.values
       end
 
-      if !callable
+      unless callable
         if named
           message = "Named arguments are not supported for #{call_type} \"#{call_name}\"."
         else
@@ -119,9 +113,6 @@ pp parameters
 
       # manage named arguments
       callable_parameters = get_callable_parameters(callable, is_variadic).map{|x| x[1]=x[1].to_s; x}
-
-puts 'callable_parameters:'
-pp callable_parameters
 
       arguments = []
       names = []
@@ -168,7 +159,7 @@ pp callable_parameters
       if is_variadic
         arbitrary_arguments = Twig::Node::Expression::Array.new([], -1)
         parameters.each do |key, value|
-          if is_int(key)
+          if key.is_a?(Integer)
             arbitrary_arguments.add_element(value)
           else
             arbitrary_arguments.add_element(value, Twig::Node::Expression::Constant.new(key, -1))
@@ -182,9 +173,6 @@ pp callable_parameters
         end
       end
 
-puts 'parameters:'
-pp parameters
-
       if parameters.any?
         unknown_parameter = nil
         parameters.each do |parameter|
@@ -197,8 +185,6 @@ pp parameters
         raise Twig::Error::Syntax.new("Unknown argument#{parameters.length > 1 ? 's' : ''} \"#{parameters.keys.join(', ')}\" for #{call_type} \"#{call_name}(#{names.join(', ')})\".", unknown_parameter ? unknown_parameter.line : -1)
       end
 
-puts 'out arguments:'
-pp arguments
       arguments
     end
 
@@ -242,10 +228,10 @@ pp arguments
       if has_node('node') # TODO! chech this!
         parameters.shift
       end
-      if get_attribute(:needs_environment)
+      if has_attribute(:needs_environment) && get_attribute(:needs_environment)
         parameters.shift
       end
-      if get_attribute(:needs_context)
+      if has_attribute(:needs_context) && get_attribute(:needs_context)
         parameters.shift
       end
       if has_attribute('arguments') && nil != get_attribute('arguments')

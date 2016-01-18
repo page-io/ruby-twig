@@ -36,13 +36,17 @@ module Twig
       @stream.filename
     end
 
-    # {@inheritdoc}
     def parse(stream, _test = nil, drop_needle = false)
       # push all variables into the stack to keep the current state of the parser
-      # vars = {
-      #   unset(vars['stack'], vars['env'], vars['handlers'], vars['visitors'], vars['expressionParser'], vars['reservedMacroNames'])
-      # end
-      # @stack << vars
+      # TODO! check this!
+      vars = {
+        env: @env,
+        handlers: @hnadlers,
+        visitors: @visitors,
+        expression_parser: @expression_parser,
+        reserved_macro_names: @reserved_macro_names
+      }
+      @stack << vars
 
       # tag handlers
       if @handlers.nil?
@@ -74,17 +78,17 @@ module Twig
         if !ex.get_template_line
           ex.set_template_line(@stream.current_token.lineno)
         end
-        raise ex
+        raise
       end
 
       node = Twig::Node::Module.new(Twig::Node::Body.new([body]), @parent, Twig::Node.new(@blocks), Twig::Node.new(@macros), Twig::Node.new(@traits), @embedded_templates, filename)
       traverser = Twig::NodeTraverser.new(@env, @visitors)
       node = traverser.traverse(node)
 
-      # # restore previous stack so previous parse() call can resume working
-      # @stack.pop.each do |key, val|
-      #   key = val
-      # end
+      # restore previous stack so previous parse() call can resume working
+      @stack.pop.each do |key, val|
+        instance_variable_set("@#{key}",val)
+      end
       node
     end
 
@@ -92,11 +96,8 @@ module Twig
       lineno = current_token.lineno
       rv = []
 
-      puts "debug: subparser #{@stream}"
-
       while !@stream.eos?
         token_type = current_token.type
-        puts "debug: subparser token #{token_type}"
 
         case token_type
         when :text_type
@@ -126,14 +127,14 @@ module Twig
           end
           subparser = @handlers.get_token_parser(token.value)
           if subparser.nil?
-            if !_test.nil?
+            if _test.nil?
+              ex = Twig::Error::Syntax.new("Unknown \"#{token.value}\" tag.", token.lineno, filename)
+              ex.add_suggestions(token.value, @env.get_tags.keys)
+            else
               ex = Twig::Error::Syntax.new("Unexpected \"#{token.value()}\" tag", token.lineno, filename)
               if _test.is_a?(::Array) && _test.length > 0 && _test[0].is_a?(Twig::TokenParser)
                 ex.append_message(" (expecting closing tag for the \"#{_test[0].tag}\" tag defined near line #{lineno}).")
               end
-            else
-              ex = Twig::Error::Syntax.new("Unknown \"#{token.value}\" tag.", token.lineno, filename)
-              ex.add_suggestions(token.value, @env.get_tags.keys)
             end
             raise ex
           end
@@ -293,9 +294,9 @@ module Twig
       if node.is_a?(Twig::Node::Output)
         return
       end
-      node.each do |k,n|
+      node.each do |n|
         if !n.nil? && filter_body_nodes(n).nil?
-          node.remove_node(k)
+          node.remove_node(n)
         end
       end
       node

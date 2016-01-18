@@ -170,16 +170,16 @@ module Twig
 
       def get_tests
         [
-          Twig::SimpleTest.new('even', nil, { node_class: 'Twig::Node::Expression::Test_Even'}),
-          Twig::SimpleTest.new('odd', nil, { node_class: 'Twig::Node::Expression::Test_Odd'}),
-          Twig::SimpleTest.new('defined', nil, { node_class: 'Twig::Node::Expression::Test::Defined'}),
-          Twig::SimpleTest.new('sameas', nil, { node_class: 'Twig::Node::Expression::Test_Sameas', deprecated: true, alternative: 'same as'}),
-          Twig::SimpleTest.new('same as', nil, { node_class: 'Twig::Node::Expression::Test_Sameas'}),
-          Twig::SimpleTest.new('none', nil, { node_class: 'Twig::Node::Expression::Test_Null'}),
-          Twig::SimpleTest.new('null', nil, { node_class: 'Twig::Node::Expression::Test_Null'}),
-          Twig::SimpleTest.new('divisibleby', nil, { node_class: 'Twig::Node::Expression::Test_Divisibleby', deprecated: true, alternative: 'divisible by'}),
-          Twig::SimpleTest.new('divisible by', nil, { node_class: 'Twig::Node::Expression::Test_Divisibleby'}),
-          Twig::SimpleTest.new('constant', nil, { node_class: 'Twig::Node::Expression::Test_Constant'}),
+          Twig::SimpleTest.new('even', nil, { node_class: Twig::Node::Expression::Test::Even}),
+          Twig::SimpleTest.new('odd', nil, { node_class: Twig::Node::Expression::Test::Odd}),
+          Twig::SimpleTest.new('defined', nil, { node_class: Twig::Node::Expression::Test::Defined}),
+          Twig::SimpleTest.new('sameas', nil, { node_class: Twig::Node::Expression::Test::Sameas, deprecated: true, alternative: 'same as'}),
+          Twig::SimpleTest.new('same as', nil, { node_class: Twig::Node::Expression::Test::Sameas}),
+          Twig::SimpleTest.new('none', nil, { node_class: Twig::Node::Expression::Test::Null}),
+          Twig::SimpleTest.new('null', nil, { node_class: Twig::Node::Expression::Test::Null}),
+          Twig::SimpleTest.new('divisibleby', nil, { node_class: Twig::Node::Expression::Test::Divisibleby, deprecated: true, alternative: 'divisible by'}),
+          Twig::SimpleTest.new('divisible by', nil, { node_class: Twig::Node::Expression::Test::Divisibleby}),
+          Twig::SimpleTest.new('constant', nil, { node_class: Twig::Node::Expression::Test::Constant}),
           Twig::SimpleTest.new('empty', 'Twig::Runtime.twig_test_empty'),
           Twig::SimpleTest.new('iterable', 'Twig::Runtime.twig_test_iterable'),
         ]
@@ -244,7 +244,7 @@ module Twig
         if stream.check(:punctuation_type, '(')
           arguments = parser.get_expression_parser.parse_arguments(true)
         end
-        klass.new(node, name, arguments, parser.current_token.line)
+        klass.new(node, name, arguments, parser.current_token.lineno)
       end
 
       def get_test(parser, line)

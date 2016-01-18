@@ -3,7 +3,7 @@ module Twig
   # Compiles a node.
   class Compiler
 
-    attr_reader :filename
+    attr_reader :filename, :source
 
     # Constructor.
     #

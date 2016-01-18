@@ -225,7 +225,7 @@ module Twig
       compiler
         .write("def do_display(_context, blocks = [])\n")
         .indent
-        .write("_twigout = ''\n")
+        .write("_twigout = []\n")
         .subcompile(get_node(:display_start))
         .subcompile(get_node(:body))
 
@@ -242,7 +242,7 @@ module Twig
       end
 
       compiler.
-        write("_twigout\n").
+        write("_twigout.join\n").
         subcompile(get_node(:display_end)).
         outdent.
         write("end\n\n")

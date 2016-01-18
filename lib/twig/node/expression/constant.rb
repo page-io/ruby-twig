@@ -6,7 +6,6 @@ module Twig
     end
 
     def compile(compiler)
-      puts "debug compile: #{self.class.name}"
       compiler.repr(get_attribute('value'))
     end
 

@@ -64,7 +64,7 @@ module Twig
       # push_token(:eof_type)
       if @brackets.any?
         expect, lineno = @brackets.pop
-        raise Twig::Error::Syntax.new("Unclosed \"#{expect}\" at line #{lineno}.", lineno, @filename)
+        raise Twig::Error::Syntax.new("Unclosed \"#{expect}\".", lineno, @filename)
       end
 
       Twig::TokenStream.new(@tokens, @filename)
@@ -132,7 +132,7 @@ module Twig
       # whitespace
       if @ss.scan(/\s+/)
         if @ss.eos?
-          raise Twig::Error::Syntax.new("Unclosed #{@state == :state_block ? 'block' : 'variable'} at line #{@current_var_block_line}.", @current_var_block_line, @filename)
+          raise Twig::Error::Syntax.new("Unclosed #{@state == :state_block ? 'block' : 'variable'}.", @current_var_block_line, @filename)
         end
       end
       # operators

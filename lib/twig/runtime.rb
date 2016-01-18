@@ -277,12 +277,13 @@ module Twig
       decimal_point ||= defaults[:decimal_point]
       thousand_sep ||= defaults[:thousand_separator]
 
-      number.to_f.to_s(:delimited, separator: decimal_point, delimiter: thousand_sep)
+      rounded_number = (Float(number) * (10 ** decimal)).round.to_f / 10 ** decimal
+      ("%01.#{decimal}f" % rounded_number).to_f.to_s(:delimited, separator: decimal_point, delimiter: thousand_sep)
     end
 
     #  URL encodes (RFC 3986) a string as a path segment or an array as a query string.
     #
-    #  @param string|array $url A URL or an array of query parameters
+    #  @param string|array url A URL or an array of query parameters
     #
     #  @return string The URL encoded value
     def self.twig_urlencode_filter(url)
@@ -551,7 +552,7 @@ module Twig
 
     #  Escapes a string.
     #
-    #  @param Twig_Environment env        A Twig_Environment instance
+    #  @param Twig_Environment env        A Twig::Environment instance
     #  @param string           string     The value to be escaped
     #  @param string           strategy   The escaping strategy
     #  @param string           charset    The charset
@@ -781,7 +782,7 @@ module Twig
     #
     # Returns a titlecased string.
     #
-    # @param Twig_Environment env    A Twig_Environment instance
+    # @param Twig::Environment env    A Twig_Environment instance
     # @param string           string A string
     #
     # @return string The titlecased string
@@ -842,12 +843,12 @@ module Twig
     #
     #  @return bool true if the value is traversable
     def self.twig_test_iterable(value)
-      value.is_a?(Traversable) || is_array(value)
+      value.responds_to?(:each)
     end
 
     #  Renders a template.
     #
-    #  @param Twig_Environment env
+    #  @param env [Twig::Environment]
     #  @param array            $context
     #  @param string|array     template      The template to render or an array of templates to try consecutively
     #  @param array            variables     The variables to pass to the template
@@ -859,10 +860,10 @@ module Twig
     def self.twig_include(env, context, template, variables = [], with_context = true, ignore_missing = false, sandboxed = false)
       already_sandboxed = false
       sandbox = nil
-      if (with_context)
+      if with_context
         variables = array_merge(context, variables)
       end
-      if (is_sandboxed = sandboxed && env.has_extension('sandbox'))
+      if is_sandboxed = sandboxed && env.has_extension('sandbox')
         sandbox = env.get_extension('sandbox')
         unless already_sandboxed = sandbox.is_sandboxed()
           sandbox.enable_sandbox

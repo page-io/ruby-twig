@@ -2,6 +2,10 @@ module Twig
   class Error::Syntax < Twig::Error
 
     def initialize(message, lineno = -1, filename = nil)
+      annotation = []
+      annotation << " '#{filename}'" unless filename.nil?
+      annotation << " line #{lineno}" if lineno > 0
+      message = 'At' << annotation.join << "\n" << message if annotation.any?
       super
     end
 
@@ -10,14 +14,12 @@ module Twig
     # @param string $name  The original name of the item that does not exist
     # @param array  $items An array of possible items
     def add_suggestions(name, items)
-    #     if (!$alternatives = self::computeAlternatives($name, $items)) {
-    #         return;
+    #     unless alternatives = compute_alternatives(name, items)
+    #       return
     #     end
-    #     $this->appendMessage(sprintf(' Did you mean "%s"?', implode('", "', $alternatives)));
+    #     append_message(sprintf(' Did you mean "%s"?', implode('", "', alternatives)))
     end
 
-    # # @internal
-    # #
     # # To be merged with the addSuggestions() method in 2.0.
     # public static function computeAlternatives($name, $items)
     #     $alternatives = [];

@@ -10,10 +10,10 @@ module Twig
         .add_debug_info(self)
         .write("def block_#{get_attribute('name')}(_context, blocks = [])\n")
         .indent
-        .write("_twigout = ''\n")
+        .write("_twigout = []\n")
       compiler
         .subcompile(get_node(:body))
-        .write("_twigout\n")
+        .write("_twigout.join\n")
         .outdent
         .write("end\n\n")
     end

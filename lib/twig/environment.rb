@@ -176,7 +176,7 @@ module Twig
 
     # Sets the current cache implementation.
     #
-    # @param Twig_CacheInterface|string|false cache A Twig_CacheInterface implementation,
+    # @param Twig::Cache|string|false cache A Twig::Cache implementation,
     #                                                an absolute path to the compiled templates,
     #                                                or false to disable cache
     def set_cache(cache)
@@ -217,6 +217,7 @@ module Twig
     #
     # @return string The template class name
     def get_template_class(name, index = nil)
+      name ||= ''
       # key = loader.get_cache_key(name)
       # key = key + @extensions.keys.to_s
       # key = + function_exists('twig_template_get_attributes')
@@ -226,10 +227,10 @@ module Twig
 
     # Renders a template.
     #
-    # @param string name    The template name
-    # @param array  $context An array of parameters to pass to the template
+    # @param name [String]  The template name
+    # @param context [Hash] An hash of parameters to pass to the template
     #
-    # @return string The rendered template
+    # @return [String] The rendered template
     #
     # @raise Twig::Error::Loader  When the template cannot be found
     # @raise Twig::Error::Syntax  When an error occurred during compilation
@@ -260,20 +261,20 @@ module Twig
     # @raise Twig::Error::Loader When the template cannot be found
     # @raise Twig::Error::Syntax When an error occurred during compilation
     def load_template(name, index = nil)
-      klass = get_template_class(name, index)
-      if @loaded_templates.key?(klass)
-        return @loaded_templates[klass]
+      klass_name = get_template_class(name, index)
+      if @loaded_templates.key?(klass_name)
+        return @loaded_templates[klass_name]
       end
-      # if (!class_exists(klass, false))
+      # unless defined? klass_name
       #   if (@bc_get_cache_filename)
       #     key = get_cache_filename(name)
       #   else
-      #     key = @cache.generate_key(name, klass)
+      #     key = @cache.generate_key(name, klass_name)
       #   end
       #   if (!is_auto_reload() || is_template_fresh(name, @cache.get_timestamp(key)))
       #     @cache.load(key)
       #   end
-      #   if (!class_exists(klass, false))
+      #   if (!class_exists(klass_name, false))
           content = compile_source(loader.get_source(name), name)
       #     if (@bc_write_cache_file)
       #       write_cache_file(key, content)
@@ -281,14 +282,13 @@ module Twig
       #       @cache.write(key, content)
       #     end
 
-          puts content
+          # puts content
           eval(content)
-
       #   end
       # end
       init_runtime if !@runtime_initialized
-      klass = klass.split('::').inject(Object) {|o,c| o.const_get c}
-      @loaded_templates[klass] = klass.new(self)
+      klass = klass_name.split('::').inject(Object) {|o,c| o.const_get c}
+      @loaded_templates[klass_name] = klass.new(self)
     end
 
     # # Creates a template from source.

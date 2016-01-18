@@ -8,7 +8,7 @@ module Twig
       @callable = callable
       @options = {
         is_variadic: false,
-        node_class: 'Twig::Node::Expression::Test',
+        node_class: Twig::Node::Expression::Test,
         deprecated: false,
         alternative: nil
       }.merge(options)
