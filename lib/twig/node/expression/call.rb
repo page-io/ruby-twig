@@ -26,7 +26,7 @@ module Twig
     end
 
     def compile_arguments(compiler)
-      compiler.raw('[')
+      compiler.raw('(')
 
       first = true
 
@@ -72,7 +72,7 @@ module Twig
         end
       end
 
-      compiler.raw(']')
+      compiler.raw(')')
     end
 
     #
