@@ -133,7 +133,7 @@ module Twig
         rescue => ex
           raise Twig::Error::Runtime.new("An exception has been thrown during the rendering of a template (\"#{ex.message}\").", -1, template.get_template_name, ex)
         end
-      elsif (false != parent = get_tarent(context))
+      elsif (false != parent = get_parent(context))
         parent.display_block(name, context, @blocks.merge(blocks), false)
       end
     end
