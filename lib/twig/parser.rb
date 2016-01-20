@@ -294,11 +294,7 @@ module Twig
       if node.is_a?(Twig::Node::Output)
         return
       end
-      node.each do |n|
-        if !n.nil? && filter_body_nodes(n).nil?
-          node.remove_node(n)
-        end
-      end
+      node.nodes.reject! { |n| !n.nil? && filter_body_nodes(n).nil? }
       node
     end
   end
