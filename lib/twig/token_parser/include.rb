@@ -8,7 +8,7 @@ module Twig
     end
 
     def parse_arguments
-      stream = @parser.get_stream
+      stream = @parser.stream
       ignore_missing = false
       if stream.next_if(:name_type, 'ignore'.freeze)
         stream.expect(:name_type, 'missing'.freeze)

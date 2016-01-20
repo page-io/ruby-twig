@@ -85,7 +85,7 @@ module Twig
       elsif (parent = get_parent(context))
         parent.display_block(name, context, blocks, false)
       else
-        raise Twig::Error::Runtime.new(sprintf('The template has no parent and no traits defining the "%s" block', name), -1, $this.getTemplateName());
+        raise Twig::Error::Runtime.new(sprintf('The template has no parent and no traits defining the "%s" block', name), -1, get_template_name)
       end
     end
 
@@ -112,6 +112,7 @@ module Twig
         template = nil
         block = nil
       end
+
       if !template.nil?
         # avoid RCEs when sandbox is enabled
         unless template.is_a?(Twig::Template)
@@ -361,14 +362,14 @@ module Twig
           return is_defined_test ? true : object[item]
         end
 
-        if (:array_call == call_type || !object.is_a?(Object))
+        if :array_call == call_type || !object.is_a?(Object)
           if is_defined_test
             return false
           end
           if ignore_strict_check || !@env.is_strict_variables
             return
           end
-          if (object.is_a?(::Hash) || object.is_a?(::Array))
+          if object.is_a?(::Hash) || object.is_a?(::Array)
             if object.empty?
               message = "Key \"#{item}\" does not exist as the array is empty"
             else
@@ -377,17 +378,17 @@ module Twig
           elsif object.respond_to?(:[])
             message = "Key \"#{item}\" in object with [] access of class \"#{object.class}\" does not exist"
           elsif object.is_a?(Object)
-            message = sprintf("Impossible to access a key \"#{}\" on an object of class \"#{}\" that does not implement ArrayAccess interface", item, object.class)
+            message = "Impossible to access a key \"#{item}\" on an object of class \"#{object.class}\" that does not implement [] method"
           elsif :array_call == call_type
             if object.nil?
               message = "Impossible to access a key (\"#{item}\") on a null variable"
             else
-              message = "Impossible to access a key (\"#{item}\") on a #{gettype(object)} variable (\"#{object}\")"
+              message = "Impossible to access a key (\"#{item}\") on a #{object.class} variable (\"#{object}\")"
             end
           elsif object.nil?
             message = "Impossible to access an attribute (\"#{item}\") on a null variable"
           else
-            message = "Impossible to access an attribute (\"#{item}\") on a #{gettype(object)} variable (\"#{object}\")"
+            message = "Impossible to access an attribute (\"#{item}\") on a #{object.class} variable (\"#{object}\")"
           end
           raise Twig::Error::Runtime.new(message, -1, get_template_name)
         end
@@ -481,6 +482,10 @@ module Twig
         return ret == '' ? '' : Twig::Markup.new(ret, @env.getCharset())
       end
       ret
+    end
+
+    def call_user_func(callable, *args)
+      callable[0].send(callable[1].to_sym, args)
     end
   end
 end

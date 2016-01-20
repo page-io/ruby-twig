@@ -7,7 +7,7 @@ module Twig
     # @param Twig_NodeVisitorInterface[] visitors An array of Twig_NodeVisitorInterface instances
     def initialize(env,  visitors = [])
       @env = env
-      @visitors = visitors
+      @visitors = {}
       visitors.each do |visitor|
         add_visitor(visitor)
       end
@@ -15,9 +15,9 @@ module Twig
 
     # Adds a visitor.
     #
-    # @param Twig_NodeVisitorInterface visitor A Twig_NodeVisitorInterface instance
-    def addVisitor(visitor)
-      if !(@visitors.key?(visitor.get_priority))
+    # @param Twig::NodeVisitor visitor A Twig::NodeVisitor instance
+    def add_visitor(visitor)
+      unless @visitors.key?(visitor.get_priority)
         @visitors[visitor.get_priority] = []
       end
       @visitors[visitor.get_priority] << visitor
@@ -25,13 +25,12 @@ module Twig
 
     # Traverses a node and calls the registered visitors.
     #
-    # @param Twig_NodeInterface node A Twig_NodeInterface instance
+    # @param node [Twig::Node] A Twig::Node instance
     #
-    # @return Twig_NodeInterface
+    # @return Twig::Node
     def traverse(node)
-      #ksort(@visitors)
-      @visitors.each do |visitors|
-        visitors.each do |visitor|
+      @visitors.keys.sort.each do |priority|
+        @visitors[priority].each do |visitor|
           node = traverse_for_visitor(visitor, node)
         end
       end

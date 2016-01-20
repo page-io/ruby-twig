@@ -3,29 +3,16 @@ require 'securerandom'
 module Twig
   class Parser
 
+    attr_reader :environment, :stream
+    attr_accessor :parent
+
     # Constructor.
     #
     # @param env [Twig::Environment] A Twig::Environment instance
-    def initialize(env)
-      @env = env
+    def initialize(environment)
+      @environment = environment
       @stack = []
-      #  protected $stream;
-      #  protected $parent;
-      #  protected $handlers;
-      #  protected $visitors;
-      #  protected $expressionParser;
-      #  protected $blocks;
-      #  protected $blockStack;
       @macros = {}
-      #  protected $env;
-      #  protected $reservedMacroNames;
-      #  protected $importedSymbols;
-      #  protected $traits;
-      #  protected $embeddedTemplates = [];
-    end
-
-    def environment
-      @env
     end
 
     def get_var_name
@@ -40,7 +27,7 @@ module Twig
       # push all variables into the stack to keep the current state of the parser
       # TODO! check this!
       vars = {
-        env: @env,
+        env: @environment,
         handlers: @hnadlers,
         visitors: @visitors,
         expression_parser: @expression_parser,
@@ -50,13 +37,13 @@ module Twig
 
       # tag handlers
       if @handlers.nil?
-        @handlers = @env.get_token_parsers
+        @handlers = @environment.get_token_parsers
         @handlers.parser = self
       end
 
       # node visitors
-      @visitors ||= @env.get_node_visitors
-      @expression_parser ||= Twig::ExpressionParser.new(self, @env.get_unary_operators, @env.get_binary_operators)
+      @visitors ||= @environment.get_node_visitors
+      @expression_parser ||= Twig::ExpressionParser.new(self, @environment.get_unary_operators, @environment.get_binary_operators)
       @stream = stream
       @parent = nil
       @blocks = {}
@@ -72,17 +59,17 @@ module Twig
           body = Twig::Node.new
         end
       rescue Twig::Error::Syntax => ex
-        if !ex.get_template_file
+        unless ex.get_template_file
           ex.set_template_file(filename)
         end
-        if !ex.get_template_line
+        unless ex.get_template_line
           ex.set_template_line(@stream.current_token.lineno)
         end
         raise
       end
 
       node = Twig::Node::Module.new(Twig::Node::Body.new([body]), @parent, Twig::Node.new(@blocks), Twig::Node.new(@macros), Twig::Node.new(@traits), @embedded_templates, filename)
-      traverser = Twig::NodeTraverser.new(@env, @visitors)
+      traverser = Twig::NodeTraverser.new(@environment, @visitors)
       node = traverser.traverse(node)
 
       # restore previous stack so previous parse() call can resume working
@@ -129,7 +116,7 @@ module Twig
           if subparser.nil?
             if _test.nil?
               ex = Twig::Error::Syntax.new("Unknown \"#{token.value}\" tag.", token.lineno, filename)
-              ex.add_suggestions(token.value, @env.get_tags.keys)
+              ex.add_suggestions(token.value, @environment.get_tags.keys)
             else
               ex = Twig::Error::Syntax.new("Unexpected \"#{token.value()}\" tag", token.lineno, filename)
               if _test.is_a?(::Array) && _test.length > 0 && _test[0].is_a?(Twig::TokenParser)
@@ -140,7 +127,7 @@ module Twig
           end
           @stream.next
           node = subparser.parse(token)
-          if !node.nil?
+          unless node.nil?
             rv << node
           end
         else
@@ -204,7 +191,7 @@ module Twig
       name = name.downcase
       if @reserved_macro_names.nil?
         @reserved_macro_names = []
-        r = @env.base_template_class.split('::').inject(Object){|a,b| a.const_get(b)}
+        r = @environment.base_template_class.split('::').inject(Object){|a,b| a.const_get(b)}
         r.methods.each do |method|
           @reserved_macro_names << method.to_s
         end
@@ -220,19 +207,19 @@ module Twig
       @traits.any?
     end
 
-    # def embedTemplate(template)
-    #   template.set_Index(mt_rand())
+    # def embed_template(template)
+    #   template.set_index(mt_rand())
     #   @embedded_templates << template
     # end
 
-    def add_imported_symbol(type, _alias, name = nil, node = nil)
-      (@imported_symbols[0][type] ||= {})[_alias] = {'name' => name, 'node' => node}
+    def add_imported_symbol(type, symbol_alias, name = nil, node = nil)
+      (@imported_symbols[0][type] ||= {})[symbol_alias] = {'name' => name, 'node' => node}
     end
 
-    def get_imported_symbol(type, _alias)
+    def get_imported_symbol(type, symbol_alias)
       @imported_symbols.each do |functions|
-        if functions.key?(type) && functions[type].key?(_alias)
-          return functions[type][_alias]
+        if functions.key?(type) && functions[type].key?(symbol_alias)
+          return functions[type][symbol_alias]
         end
       end
       nil
@@ -255,21 +242,6 @@ module Twig
     # @return Twig_ExpressionParser The expression parser
     def get_expression_parser
       @expression_parser
-    end
-
-    def get_parent
-      @parent
-    end
-
-    def set_parent(parent)
-      @parent = parent
-    end
-
-    # Gets the token stream.
-    #
-    # @return Twig_TokenStream The token stream
-    def get_stream
-      @stream
     end
 
     # Gets the current token.

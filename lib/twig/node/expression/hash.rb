@@ -1,8 +1,6 @@
 module Twig
   class Node::Expression::Hash < Node::Expression
 
-    # protected $index;
-
     def initialize(elements, lineno)
       super(elements, nil, lineno)
     end

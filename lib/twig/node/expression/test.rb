@@ -14,7 +14,7 @@ module Twig
       set_attribute(:thing, _test)
 
       if _test.is_a?(Twig::SimpleTest)
-        set_attribute(:callable, _test.get_callable)
+        set_attribute(:callable, _test.callable)
         set_attribute(:is_variadic, _test.is_variadic)
       end
 

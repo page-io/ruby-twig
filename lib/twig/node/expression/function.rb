@@ -16,10 +16,8 @@ module Twig
       set_attribute(:needs_context, function.needs_context?)
       set_attribute('arguments', function.arguments)
 
-      if function.is_a?(Twig::SimpleFunction) || function.is_a?(Twig::FunctionCallable)
-        set_attribute(:callable, function.get_callable)
-      end
       if function.is_a?(Twig::SimpleFunction)
+        set_attribute(:callable, function.callable)
         set_attribute(:is_variadic, function.is_variadic)
       end
 

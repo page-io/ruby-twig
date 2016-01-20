@@ -149,8 +149,8 @@ module Twig
           Twig::SimpleFilter.new('default', '_twig_default_filter', {:node_class => Twig::Node::Expression::Filter::Default}),
           Twig::SimpleFilter.new('keys', 'Twig::Runtime.twig_get_array_keys_filter'),
           # escaping
-          Twig::SimpleFilter.new('escape', 'twig_escape_filter', {needs_environment: true, is_safe_callback: 'twig_escape_filter_is_safe'}),
-          Twig::SimpleFilter.new('e', 'twig_escape_filter', {needs_environment: true, is_safe_callback: 'twig_escape_filter_is_safe'}),
+          Twig::SimpleFilter.new('escape', 'Twig::Runtime.twig_escape_filter', {needs_environment: true, is_safe_callback: 'twig_escape_filter_is_safe'}),
+          Twig::SimpleFilter.new('e', 'Twig::Runtime.twig_escape_filter', {needs_environment: true, is_safe_callback: 'twig_escape_filter_is_safe'}),
         ]
       end
 
@@ -229,9 +229,9 @@ module Twig
       end
 
       def parse_test_expression(parser, node)
-        stream = parser.get_stream
+        stream = parser.stream
         name, test = get_test(parser, node.lineno)
-        if test.is_a?(Twig::SimpleTest) && test.is_deprecated
+        if test.is_a?(Twig::SimpleTest) && test.deprecated?
           message = "Twig Test \"#{name}\" is deprecated"
           if test.get_alternative
             message.concat ". Use \"#{test.get_alternative}\" instead"
@@ -248,28 +248,28 @@ module Twig
       end
 
       def get_test(parser, line)
-        stream = parser.get_stream;
+        stream = parser.stream
         name = stream.expect(:name_type).value
         env = parser.environment
-        if (test = env.get_test(name))
+        if test = env.get_test(name)
           return [name, test]
         end
-        if (stream.check(:name_type))
+        if stream.check(:name_type)
           # try 2-words tests
           name.concat = ' ', parser.current_token.value
-          if (test = env.get_test(name))
-            parser.get_stream.next
+          if test = env.get_test(name)
+            parser.stream.next
             return [name, test]
           end
         end
-        ex = Twig::Error::Syntax.new("Unknown \"#{name}\" test.", line, parser.filename);
+        ex = Twig::Error::Syntax.new("Unknown \"#{name}\" test.", line, parser.filename)
         ex.add_suggestions(name, env.get_tests.keys)
         raise ex
       end
 
       def get_test_node_class(parser, _test)
         if _test.is_a?(Twig::SimpleTest)
-          return _test.get_node_class
+          return _test.node_class
         end
         _test.is_a?(Twig::Test::Node) ? _test.class : Twig::Node::Expression::Test
       end

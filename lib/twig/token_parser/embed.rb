@@ -2,7 +2,7 @@ module Twig
   class TokenParser::Embed < Twig::TokenParser
 
     def parse(token)
-      stream = @parser.get_stream
+      stream = @parser.stream
       parent = @parser.get_expression_parser.parse_expression
       variables, only, ignore_missing = parse_arguments
       # inject a fake parent to make the parent() function work

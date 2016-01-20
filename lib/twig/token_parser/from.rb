@@ -3,7 +3,7 @@ module Twig
 
     def parse(token)
       macro = @parser.get_expression_parser.parse_expression
-      stream = @parser.get_stream
+      stream = @parser.stream
       stream.expect('import'.freeze)
       targets = {}
       while true

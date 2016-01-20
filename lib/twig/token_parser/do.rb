@@ -3,7 +3,7 @@ module Twig
 
     def parse(token)
       expr = @parser.get_expression_parser.parse_expression
-      @parser.get_stream.expect(:block_end_type)
+      @parser.stream.expect(:block_end_type)
       Twig::Node::Do.new(expr, token.lineno, tag)
     end
 

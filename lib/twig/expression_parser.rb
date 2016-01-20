@@ -13,7 +13,7 @@ module Twig
       token = @parser.current_token
       while is_binary(token) && @binary_operators[token.value]['precedence'] >= precedence
         op = @binary_operators[token.value]
-        @parser.get_stream.next
+        @parser.stream.next
         if op.key?(:callable)
           expr = op[:callable][0].send(op[:callable][1], @parser, expr)
         else
@@ -33,24 +33,24 @@ module Twig
       token = @parser.current_token
       if is_unary(token)
         operator = @unary_operators[token.value]
-        @parser.get_stream.next
+        @parser.stream.next
         expr = parse_expression(operator['precedence'])
         klass = operator['class']
         return parse_postfix_expression(klass.new(expr, token.lineno))
       elsif token.check(:punctuation_type, '(')
-        @parser.get_stream.next
+        @parser.stream.next
         expr = parse_expression
-        @parser.get_stream.expect(:punctuation_type, ')', 'An opened parenthesis is not properly closed')
+        @parser.stream.expect(:punctuation_type, ')', 'An opened parenthesis is not properly closed')
         return parse_postfix_expression(expr)
       end
       parse_primary_expression
     end
 
     def parse_conditional_expression(expr)
-      while @parser.get_stream.next_if(:punctuation_type, '?')
-        if !@parser.get_stream.next_if(:punctuation_type, ':')
+      while @parser.stream.next_if(:punctuation_type, '?')
+        if !@parser.stream.next_if(:punctuation_type, ':')
           expr2 = parse_expression
-          if @parser.get_stream.next_if(:punctuation_type, ':')
+          if @parser.stream.next_if(:punctuation_type, ':')
             expr3 = parse_expression
           else
             expr3 = Twig::Node::Expression::Constant.new('', @parser.current_token.lineno)
@@ -76,7 +76,7 @@ module Twig
       token = @parser.current_token
       case token.type
       when :name_type
-        @parser.get_stream.next
+        @parser.stream.next
         case token.value
         when 'true','TRUE'
           node = Twig::Node::Expression::Constant.new(true, token.lineno)
@@ -93,7 +93,7 @@ module Twig
         end
 
       when :number_type
-        @parser.get_stream.next
+        @parser.stream.next
         node = Twig::Node::Expression::Constant.new(token.value, token.lineno)
 
       when :string_type,:interpolation_start_type
@@ -102,7 +102,7 @@ module Twig
       when :operator_type
         if (match = token.value.match(Twig::Lexer::REGEX_NAME)) && (match[0] == token.value)
           # in this context, string operators are variable names
-          @parser.get_stream.next
+          @parser.stream.next
           node = Twig::Node::Expression::Name.new(token.value, token.lineno)
         elsif @unary_operators.key?(token.value)
           klass = @unary_operators[token.value]['class']
@@ -112,7 +112,7 @@ module Twig
           unless [neg_class, pos_class].include?(ref.get_name) || ref.is_subclass_of(neg_class) || ref.is_subclass_of(pos_class)
             raise Twig::Error::Syntax.new("Unexpected unary operator \"#{token.value}\".", token.lineno, @parser.filename)
           end
-          @parser.get_stream.next
+          @parser.stream.next
           expr = parse_primary_expression
           node = klass.new(expr, token.lineno)
         end
@@ -129,7 +129,7 @@ module Twig
     end
 
     def parse_string_expression
-      stream = @parser.get_stream
+      stream = @parser.stream
       nodes = []
       # a string cannot be followed by another string in a single expression
       next_can_be_tring = true
@@ -153,7 +153,7 @@ module Twig
     end
 
     def parse_array_expression
-      stream = @parser.get_stream
+      stream = @parser.stream
       stream.expect(:punctuation_type, '[', 'An array element was expected')
 
       nodes = []
@@ -174,7 +174,7 @@ module Twig
     end
 
     def parse_hash_expression
-      stream = @parser.get_stream
+      stream = @parser.stream
       stream.expect(:punctuation_type, '{', 'A hash element was expected')
       node = Twig::Node::Expression::Hash.new(nil, stream.current_token.lineno)
       first = true
@@ -233,7 +233,7 @@ module Twig
         unless @parser.get_block_stack
           raise Twig::Error::Syntax.new('Calling "parent" outside a block is forbidden.', line, @parser.filename)
         end
-        if !@parser.get_parent && !@parser.has_traits
+        if !@parser.parent && !@parser.has_traits
           raise Twig::Error::Syntax.new('Calling "parent" on a template that does not extend nor "use" another template is forbidden.', line, @parser.filename)
         end
         return Twig::Node::Expression::Parent.new(@parser.peek_block_stack, line)
@@ -262,7 +262,7 @@ module Twig
     end
 
     def parse_subscript_expression(node)
-      stream = @parser.get_stream
+      stream = @parser.stream
       token = stream.next
       lineno = token.lineno
       arguments = Twig::Node::Expression::Array.new([], lineno)
@@ -326,25 +326,25 @@ module Twig
     end
 
     def parse_filter_expression(node)
-      @parser.get_stream.next
+      @parser.stream.next
       parse_filter_expression_raw(node)
     end
 
     def parse_filter_expression_raw(node, tag = nil)
       while true
-        token = @parser.get_stream.expect(:name_type)
+        token = @parser.stream.expect(:name_type)
         name = Twig::Node::Expression::Constant.new(token.value, token.lineno)
-        unless @parser.get_stream.check(:punctuation_type, '(')
+        unless @parser.stream.check(:punctuation_type, '(')
           arguments = Twig::Node.new
         else
           arguments = parse_arguments(true)
         end
         klass = get_filter_node_class(name.get_attribute('value'), token.lineno)
         node = klass.new(node, name, arguments, token.lineno, tag)
-        unless @parser.get_stream.check(:punctuation_type, '|')
+        unless @parser.stream.check(:punctuation_type, '|')
           break
         end
-        @parser.get_stream.next
+        @parser.stream.next
       end
       node
     end
@@ -359,7 +359,7 @@ module Twig
     #  @raise [Twig::Error::Syntax]
     def parse_arguments(named_arguments = false, definition = false)
       args = {}
-      stream = @parser.get_stream
+      stream = @parser.stream
       stream.expect(:punctuation_type, '(', 'A list of arguments must begin with an opening parenthesis')
       while !stream.check(:punctuation_type, ')')
         if args.any?
@@ -407,12 +407,12 @@ module Twig
     def parse_assignment_expression
       targets = []
       while true
-        token = @parser.get_stream.expect(:name_type, nil, 'Only variables can be assigned to')
+        token = @parser.stream.expect(:name_type, nil, 'Only variables can be assigned to')
         if ['true', 'false', 'none'].include?(token.value)
           raise Twig::Error::Syntax.new("You cannot assign a value to \"#{token.value}\".", token.lineno, @parser.filename)
         end
         targets << Twig::Node::Expression::AssignName.new(token.value, token.lineno)
-        unless @parser.get_stream.next_if(:punctuation_type, ',')
+        unless @parser.stream.next_if(:punctuation_type, ',')
           break
         end
       end
@@ -421,7 +421,7 @@ module Twig
 
     def parse_multitarget_expression
       targets = [parse_expression]
-      while @parser.get_stream.next_if(:punctuation_type, ',')
+      while @parser.stream.next_if(:punctuation_type, ',')
         targets << parse_expression
       end
       Twig::Node.new(targets)
@@ -435,7 +435,7 @@ module Twig
         raise ex
       end
       if function.is_a?(Twig::SimpleFunction)
-        if function.is_deprecated
+        if function.deprecated?
           message = "Twig Function \"#{function.get_name}\" is deprecated"
           if function.get_alternative
             message << ". Use \"#{function.get_alternative}\" instead"
@@ -443,7 +443,7 @@ module Twig
           message << " in \"#{@parser.filename}\" at line #{line}."
           warn message
         end
-        return function.get_node_class
+        return function.node_class
       end
       function.is_a?(Twig::Function::Node) ? function.class : Twig::Node::Expression::Function
     end
@@ -455,7 +455,7 @@ module Twig
         ex.add_suggestions(name, env.get_filters.keys)
         raise ex
       end
-      if filter.is_a?(Twig::SimpleFilter) && filter.is_deprecated
+      if filter.is_a?(Twig::SimpleFilter) && filter.deprecated?
         message = "Twig Filter \"#{filter.get_name}\" is deprecated"
         if filter.get_alternative
           message << ". Use \"#{filter.get_alternative}\" instead"
@@ -464,7 +464,7 @@ module Twig
         # @trigger_error(message, E_USER_DEPRECATED)
       end
       if filter.is_a?(Twig::SimpleFilter)
-        return filter.get_node_class
+        return filter.node_class
       end
       filter.is_a?(Twig::Filter::Node) ? filter.class : Twig::Node::Expression::Filter
     end

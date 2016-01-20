@@ -293,15 +293,15 @@ module Twig
 
         nodes.each do |node|
           if !node.length
-            continue
+            next
           end
 
           if node.is_a?(Twig::Node::Text) && ctype_space(node.get_attribute('data'))
-            continue
+            next
           end
 
           if node.is_a?(Twig::Node::BlockReference)
-            continue
+            next
           end
 
           traitable = false

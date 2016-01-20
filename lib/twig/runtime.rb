@@ -185,7 +185,7 @@ module Twig
     def self.twig_date_converter(env, date = nil, timezone = nil)
       return date
       # determine the timezone
-      if (false != timezone)
+      if false != timezone
         if (nil == timezone)
           timezone = env.get_extension('core').get_timezone
         elsif !timezone.is_a?(DateTimeZone)
@@ -552,24 +552,20 @@ module Twig
 
     #  Escapes a string.
     #
-    #  @param Twig_Environment env        A Twig::Environment instance
-    #  @param string           string     The value to be escaped
-    #  @param string           strategy   The escaping strategy
-    #  @param string           charset    The charset
-    #  @param bool             autoescape Whether the function is called by the auto-escaping feature (true) or by the developer (false)
+    #  @param env [Twig::Environment] A Twig::Environment instance
+    #  @param string [String]         The value to be escaped
+    #  @param strategy [String]       The escaping strategy
+    #  @param charset [String]        The charset
+    #  @param autoescape [Boolean]    Whether the function is called by the auto-escaping feature (true) or by the developer (false)
     #
     #  @return string
-    def self.twig_escape_filter(env, strategy = 'html', charset = nil, autoescape = false)
+    def self.twig_escape_filter(env, string, strategy = 'html', charset = nil, autoescape = false)
       if autoescape && string.is_a?(Twig::Markup)
         return string
       end
 
-      if !is_string(string)
-        if (is_object(string) && method_exists(string, 'to_tr'))
-          string = string.to_s
-        elsif ['html', 'js', 'css', 'html_attr', 'url'].include?(strategy)
-          return string
-        end
+      unless string.is_a?(String)
+        string = string.to_s
       end
 
       if charset.nil?
@@ -582,7 +578,6 @@ module Twig
         # Using a static variable to avoid initializing the array
         # each time the function is called. Moving the declaration on the
         # top of the function slow downs other escaping strategies.
-        static htmlspecialchars_charsets;
         if htmlspecialchars_charsets.nil?
           htmlspecialchars_charsets = {
             'ISO-8859-1' => true, 'ISO8859-1' => true,
@@ -601,10 +596,10 @@ module Twig
             'ISO8859-5' => true, 'ISO-8859-5' => true, 'MACROMAN' => true,
           }
         end
-        if (isset(htmlspecialchars_charsets[charset]))
+        if htmlspecialchars_charsets.key?(charset)
           return htmlspecialchars(string, ENT_QUOTES | ENT_SUBSTITUTE, charset)
         end
-        if (isset(htmlspecialchars_charsets[strtoupper(charset)]))
+        if htmlspecialchars_charsets.key?(charset.upcase)
           # cache the lowercase variant for future iterations
           htmlspecialchars_charsets[charset] = true
           return htmlspecialchars(string, ENT_QUOTES | ENT_SUBSTITUTE, charset)
@@ -623,21 +618,21 @@ module Twig
           raise Twig::Error::Runtime.new('The string to escape is not a valid UTF-8 string.')
         end
         string = preg_replace_callback('#[^a-zA-Z0-9,\._]#Su', '_twig_escape_js_callback', string)
-        if ('UTF-8' != charset)
-            string = twig_convert_encoding(string, charset, 'UTF-8')
+        if 'UTF-8' != charset
+          string = twig_convert_encoding(string, charset, 'UTF-8')
         end
         return string
 
       when 'css'
-        if ('UTF-8' != charset)
+        if 'UTF-8' != charset
           string = twig_convert_encoding(string, 'UTF-8', charset)
         end
         if (string.length == 0 ? false : (1 == preg_match('/^./su', string) ? false : true))
-            raise Twig::Error::Runtime.new('The string to escape is not a valid UTF-8 string.');
+          raise Twig::Error::Runtime.new('The string to escape is not a valid UTF-8 string.');
         end
         string = preg_replace_callback('#[^a-zA-Z0-9]#Su', '_twig_escape_css_callback', string);
-        if ('UTF-8' != charset)
-            string = twig_convert_encoding(string, charset, 'UTF-8')
+        if 'UTF-8' != charset
+          string = twig_convert_encoding(string, charset, 'UTF-8')
         end
         return string
 
@@ -645,7 +640,7 @@ module Twig
         if ('UTF-8' != charset)
           string = twig_convert_encoding(string, 'UTF-8', charset)
         end
-        if (0 == strlen(string) ? false : (1 == preg_match('/^./su', string) ? false : true))
+        if (0 == string.length ? false : (1 == preg_match('/^./su', string) ? false : true))
           raise Twig::Error::Runtime.new('The string to escape is not a valid UTF-8 string.')
         end
         string = preg_replace_callback('#[^a-zA-Z0-9,\.\-_]#Su', '_twig_escape_html_attr_callback', string)
@@ -661,11 +656,11 @@ module Twig
         if escapers.nil?
           escapers = env.get_extension('core').get_escapers
         end
-        if (isset(escapers[strategy]))
-            return call_user_func(escapers[strategy], env, string, charset)
+        if escapers.key?(strategy)
+          return call_user_func(escapers[strategy], env, string, charset)
         end
         valid_strategies = implode(', ', array_merge(['html', 'js', 'url', 'css', 'html_attr'], escapers.keys))
-        raise Twig::Error::Runtime.new(sprintf('Invalid escaping strategy "%s" (valid ones: %s).', strategy, valid_strategies));
+        raise Twig::Error::Runtime.new("Invalid escaping strategy \"#{strategy}\" (valid ones: #{valid_strategies}).")
       end
     end
 
@@ -804,7 +799,7 @@ module Twig
     end
 
     #  @internal
-    # def self.twig_ensure_traversable($seq)
+    # def self.twig_ensure_traversable(seq)
     #     if ($seq.is_a?(Traversable || is_array($seq)) {
     #         return $seq;
     #     end

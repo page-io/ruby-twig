@@ -55,7 +55,7 @@ module Twig
       # protected $baseTemplateClass;
       @extensions = {}
       # protected $parsers;
-      # protected $visitors;
+      @visitors = []
       @filters = {}
       # protected tests;
       # protected functions;
@@ -282,7 +282,7 @@ module Twig
       #       @cache.write(key, content)
       #     end
 
-          # puts content
+          puts content
           eval(content)
       #   end
       # end
@@ -658,8 +658,7 @@ module Twig
 
     # Registers a Filter.
     #
-    # @param string|Twig_SimpleFilter               name   The filter name or a Twig_SimpleFilter instance
-    # @param Twig_FilterInterface|Twig_SimpleFilter filter A Twig_FilterInterface instance or a Twig_SimpleFilter instance
+    # @param filter [Twig::SimpleFilter] A Twig::SimpleFilter instance
     def add_filter(filter)
       name = filter.get_name
       if @extension_initialized
@@ -743,31 +742,24 @@ module Twig
     #
     # @param string name The test name
     #
-    # @return Twig_Test|false A Twig_Test instance or false if the test does not exist
+    # @return Twig::Test|nil A Twig::Test instance or nil if the test does not exist
     def get_test(name)
       init_extensions if !@extension_initialized
       @tests[name]
     end
 
-    # # Registers a Function.
-    # #
-    # # @param string|Twig_SimpleFunction                 name     The function name or a Twig_SimpleFunction instance
-    # # @param Twig_FunctionInterface|Twig_SimpleFunction function A Twig_FunctionInterface instance or a Twig_SimpleFunction instance
-    # def addFunction(name, function = nil)
-    #     if (!name.is_a?(Twig_SimpleFunction && !(function.is_a?(Twig_SimpleFunction || function.is_a?(Twig_FunctionInterface)) {
-    #         raise Twig::LogicException.new('A function must be an instance of Twig_FunctionInterface or Twig_SimpleFunction');
-    #     end
-    #     if (name.is_a?(Twig_SimpleFunction) {
-    #         function = name;
-    #         name = function.getName();
-    #     else
-    #         @trigger_error(sprintf('Passing a name as a first argument to the %s method is deprecated. Pass an instance of "Twig_SimpleFunction" instead when defining function "%s".', __METHOD__, name), E_USER_DEPRECATED);
-    #     end
-    #     if (@extension_initialized) {
-    #         raise Twig::LogicException.new(sprintf('Unable to add function "%s" as extensions have already been initialized.', name));
-    #     end
-    #     @staging->addFunction(name, function);
-    # end
+    # Registers a Function.
+    #
+    # @param function [Twig::SimpleFunction] A Twig::SimpleFunction instance
+    def add_function(function)
+      unless function.is_a?(Twig::SimpleFunction)
+        raise Twig::LogicException.new('A function must be an instance of Twig::SimpleFunction')
+      end
+      if @extension_initialized
+        raise Twig::LogicException.new("Unable to add function \"#{function.name}\" as extensions have already been initialized.")
+      end
+      @staging.add_function(function.name, function)
+    end
 
     # Get a function by name.
     #
@@ -934,10 +926,9 @@ module Twig
       extension.get_filters.each do |filter|
         @filters[filter.get_name] = filter
       end
-
       # functions
       extension.get_functions.each do |function|
-        @functions[function.get_name] = function
+        @functions[function.name] = function
       end
 
       # tests
@@ -951,10 +942,10 @@ module Twig
         @parsers.add_token_parser(parser)
       end
 
-      # # node visitors
-      # extension.get_node_visitors.each do |visitor|
-      #   @visitors << visitor
-      # end
+      # node visitors
+      extension.get_node_visitors.each do |visitor|
+        @visitors << visitor
+      end
 
       # operators
       if (operators = extension.get_operators)

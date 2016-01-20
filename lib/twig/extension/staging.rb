@@ -17,7 +17,7 @@ module Twig
       end
 
       def get_functions
-        @functions
+        @functions.values
       end
 
       def add_filter(name, filter)

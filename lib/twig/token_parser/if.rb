@@ -11,7 +11,7 @@ module Twig
     def parse(token)
       lineno = token.lineno
       expr = @parser.get_expression_parser.parse_expression
-      stream = @parser.get_stream
+      stream = @parser.stream
       stream.expect(:block_end_type)
       body = @parser.subparse([self, :decide_if_fork])
       tests = [expr, body]

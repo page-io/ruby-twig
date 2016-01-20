@@ -3,7 +3,7 @@ module Twig
 
     def parse(token)
       lineno = token.lineno
-      stream = @parser.get_stream
+      stream = @parser.stream
       targets = @parser.get_expression_parser.parse_assignment_expression
       stream.expect(:operator_type, 'in')
       seq = @parser.get_expression_parser.parse_expression

@@ -3,7 +3,7 @@ module Twig
 
     def parse(token)
       lineno = token.lineno
-      stream = @parser.get_stream
+      stream = @parser.stream
       names = @parser.get_expression_parser.parse_assignment_expression
       capture = false
       if stream.next_if(:operator_type, '=')

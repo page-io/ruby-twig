@@ -20,7 +20,7 @@ module Twig
       set_attribute(:needs_context, filter.needs_context?)
       set_attribute('arguments', filter.arguments)
       if filter.is_a?(Twig::SimpleFilter) || filter.is_a?(Twig::FilterCallableInterface)
-        set_attribute(:callable, filter.get_callable)
+        set_attribute(:callable, filter.callable)
       end
       if filter.is_a?(Twig::SimpleFilter)
         set_attribute(:is_variadic, filter.is_variadic)

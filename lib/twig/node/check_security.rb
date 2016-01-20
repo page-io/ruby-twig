@@ -40,20 +40,20 @@ module Twig
         .write("rescue Twig::Sandbox::SecurityError => ex\n")
         .indent
         .write("ex.set_template_file(get_template_name)\n\n")
-        .write("if (ex.is_a?(Twig::Sandbox::SecurityNotAllowedTagError && isset(_tags[ex.get_tag_name]))\n")
+        .write("if (ex.is_a?(Twig::Sandbox::SecurityNotAllowedTagError) && isset(_tags[ex.get_tag_name]))\n")
         .indent
         .write("ex.set_templateLine(_tags[ex.get_tag_name()])\n")
         .outdent
-        .write("elsif (ex.is_a?(Twig::Sandbox::SecurityNotAllowedFilterError && isset(_filters[ex.get_filter_name]))\n")
+        .write("elsif (ex.is_a?(Twig::Sandbox::SecurityNotAllowedFilterError) && isset(_filters[ex.get_filter_name]))\n")
         .indent
-        .write("ex.set_template_line(_filters[ex.get_filter_name()])\n")
+        .write("ex.set_template_line(_filters[ex.get_filter_name])\n")
         .outdent
-        .write("elsif (ex.is_a?(Twig::Sandbox::SecurityNotAllowedFunctionError) && isset(_functions[ex->getFunctionName()]))\n")
+        .write("elsif (ex.is_a?(Twig::Sandbox::SecurityNotAllowedFunctionError) && isset(_functions[ex.get_function_name()]))\n")
         .indent
         .write("ex.set_template_line(_functions[ex.get_function_name])\n")
         .outdent
         .write("end\n\n")
-        .write("raise ex\n")
+        .write("raise\n")
         .outdent
         .write("end\n\n")
     end

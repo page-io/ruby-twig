@@ -11,7 +11,7 @@ module Twig
           compiler.raw("@env.get_extension(\'#{callable[0].get_name}\').#{callable[1]}")
         else
           type = get_attribute(:type)
-          compiler.raw("call_user_func_array(@env.get#{type}(\'#{get_attribute('name')}\').get_callable(), ")
+          compiler.raw("call_user_func(@env.get_#{type}(\'#{get_attribute('name')}\').callable, ")
           needs_closing_parenthesis = true
         end
       else
@@ -157,17 +157,13 @@ module Twig
       end
 
       if is_variadic
-        arbitrary_arguments = Twig::Node::Expression::Array.new([], -1)
+        arbitrary_arguments = Twig::Node::Expression::Hash.new([], -1)
         parameters.each do |key, value|
-          if key.is_a?(Integer)
-            arbitrary_arguments.add_element(value)
-          else
-            arbitrary_arguments.add_element(value, Twig::Node::Expression::Constant.new(key, -1))
-          end
+          arbitrary_arguments.add_element(value, Twig::Node::Expression::Constant.new(key, -1))
           parameters.delete(key)
         end
 
-        if arbitrary_arguments.count
+        if arbitrary_arguments.nodes.any?
           arguments |= optional_arguments
           arguments << arbitrary_arguments
         end

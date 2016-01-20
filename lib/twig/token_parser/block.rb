@@ -3,7 +3,7 @@ module Twig
 
     def parse(token)
       lineno = token.lineno
-      stream = @parser.get_stream
+      stream = @parser.stream
       name = stream.expect(:name_type).value
       if @parser.has_block(name)
        raise Twig::Error::Syntax.new("The block '#{name}' has already been defined line #{@parser.get_block(name).lineno}.", stream.current_token.lineno, stream.filename)

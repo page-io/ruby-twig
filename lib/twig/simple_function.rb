@@ -5,7 +5,7 @@ module Twig
   class SimpleFunction
 
     attr_accessor :arguments
-    attr_reader :name
+    attr_reader :name, :callable
 
     def initialize(name, callable, options = {})
       @name = name;
@@ -27,11 +27,7 @@ module Twig
       @name
     end
 
-    def get_callable
-      @callable
-    end
-
-    def get_node_class
+    def node_class
       @options[:node_class]
     end
 
@@ -58,7 +54,7 @@ module Twig
       @options[:is_variadic]
     end
 
-    def is_deprecated
+    def deprecated?
       @options[:deprecated]
     end
 

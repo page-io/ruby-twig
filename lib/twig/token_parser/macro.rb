@@ -3,7 +3,7 @@ module Twig
 
     def parse(token)
       lineno = token.lineno
-      stream = @parser.get_stream
+      stream = @parser.stream
       name = stream.expect(:name_type).value
       arguments = @parser.get_expression_parser.parse_arguments(true, true)
       stream.expect(:block_end_type)
