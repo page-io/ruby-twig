@@ -52,6 +52,8 @@ module Twig
     # @return string The string representation
     def self.type_to_english(type)
       case type
+      when :eof_type
+        'end of file'
       when :text_type
         'text'
       when :block_start_type
