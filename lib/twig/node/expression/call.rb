@@ -75,9 +75,9 @@ module Twig
       compiler.raw(')')
     end
 
-    #
-    # Returns an Array with the arguments defenitions
-    # :req, :opt, :key
+    # @param callable
+    # @param arguments A Twig::Node with the arguments
+    # @return An Array of Twig::Node with the arguments definitions
     def get_arguments(callable, arguments)
       call_type = get_attribute(:type)
       call_name = get_attribute('name')
@@ -188,68 +188,70 @@ module Twig
       name.gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2').gsub(/([a-z\d])([A-Z])/, '\1_\2').downcase
     end
 
-    def get_callable_method(callable)
-      if callable.is_a?(::Array)
-        method = callable.pop
-        object = callable[0]
-        if object.is_a?(String)
-          object = object.split('::').reduce(Object){|obj, ref| obj.const_get(ref.to_sym) }
-        end
-        object.method(method.to_sym)
-      elsif callable.is_a?(Proc)
-        callable.method(:call)
-      elsif callable.is_a?(String)
-        object = callable.split('::')
-        method = object.pop
-        method = method.split('.')
-        if method.length > 1
-          object << method[0]
-          method = method[1]
+    protected
+
+      def get_callable_method(callable)
+        if callable.is_a?(::Array)
+          method = callable.pop
+          object = callable[0]
+          if object.is_a?(String)
+            object = object.split('::').reduce(Object){ |obj, ref| obj.const_get(ref.to_sym) }
+          end
+          object.method(method.to_sym)
+        elsif callable.is_a?(Proc)
+          callable.method(:call)
+        elsif callable.is_a?(String)
+          object = callable.split('::')
+          method = object.pop
+          method = method.split('.')
+          if method.length > 1
+            object << method[0]
+            method = method[1]
+          else
+            method = method[0]
+          end
+          object = object.reduce(Object){ |obj, ref| obj.const_get(ref.to_sym) }
+
+          object.method(method.to_sym)
         else
-          method = method[0]
+          nil
         end
-        object = object.reduce(Object){|obj, ref| obj.const_get(ref.to_sym) }
-
-        object.method(method.to_sym)
-      else
-        nil
       end
-    end
 
-    def get_callable_parameters(callable, is_variadic=nil)
-      r = get_callable_method(callable)
+      def get_callable_parameters(callable, is_variadic=nil)
+        r = get_callable_method(callable)
 
-      parameters = r.parameters
+        parameters = r.parameters
 
-      if has_node('node') # TODO! chech this!
-        parameters.shift
-      end
-      if has_attribute(:needs_environment) && get_attribute(:needs_environment)
-        parameters.shift
-      end
-      if has_attribute(:needs_context) && get_attribute(:needs_context)
-        parameters.shift
-      end
-      if has_attribute('arguments') && nil != get_attribute('arguments')
-        get_attribute('arguments').each do |argument|
+        if has_node('node') # TODO! chech this!
           parameters.shift
         end
+        if has_attribute(:needs_environment) && get_attribute(:needs_environment)
+          parameters.shift
+        end
+        if has_attribute(:needs_context) && get_attribute(:needs_context)
+          parameters.shift
+        end
+        if has_attribute('arguments') && nil != get_attribute('arguments')
+          get_attribute('arguments').each do |argument|
+            parameters.shift
+          end
+        end
+        # if is_variadic
+        #   argument = parameters.last
+        #   if (argument && argument.is[] && argument.is_default_value_available && [] == argument.get_default_value)
+        #     parameters.pop
+        #   else
+        #     callable_name = r.name
+        #     if r.get_declaring_class
+        #       callable_name = r.get_declaring_class.name + '::' + callable_name
+        #     end
+        #
+        #     raise LogicException.new("The last parameter of \"#{callable_name}\" for #{get_attribute(:type)} \"#{get_attribute('name')}\" must be an array with default value, eg. \"array $arg = []\"\.")
+        #   end
+        # end
+        parameters
       end
-      # if is_variadic
-      #   argument = parameters.last
-      #   if (argument && argument.is[] && argument.is_default_value_available && [] == argument.get_default_value)
-      #     parameters.pop
-      #   else
-      #     callable_name = r.name
-      #     if r.get_declaring_class
-      #       callable_name = r.get_declaring_class.name + '::' + callable_name
-      #     end
-      #
-      #     raise LogicException.new("The last parameter of \"#{callable_name}\" for #{get_attribute(:type)} \"#{get_attribute('name')}\" must be an array with default value, eg. \"array $arg = []\"\.")
-      #   end
-      # end
-      parameters
-    end
 
   end
 end

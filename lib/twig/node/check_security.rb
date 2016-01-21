@@ -1,10 +1,6 @@
 module Twig
   class Node::CheckSecurity < Twig::Node
 
-#     protected $usedFilters;
-#     protected $usedTags;
-#     protected $usedFunctions;
-
     def initialize(used_filters, used_tags, used_dunctions)
         @usedFilters = used_filters
         @usedTags = used_tags

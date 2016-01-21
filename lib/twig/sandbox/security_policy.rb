@@ -35,37 +35,37 @@ module Twig
 
       def check_security(tags, filters, functions)
         tags.each do |tag|
-          if !@allowed_tags.include?(tag)
-            raise Twig::Sandbox::SecurityNotAllowedTagError.new(sprintf('Tag "%s" is not allowed.', tag), tag)
+          unless @allowed_tags.include?(tag)
+            raise Twig::Sandbox::SecurityNotAllowedTagError.new("Tag \"#{tag}\" is not allowed.", tag)
           end
         end
         filters.each do |filter|
-          if !@allowed_filters.include?(filter)
-            raise Twig::Sandbox::SecurityNotAllowedFilterError.new(sprintf('Filter "%s" is not allowed.', filter), filter)
+          unless @allowed_filters.include?(filter)
+            raise Twig::Sandbox::SecurityNotAllowedFilterError.new("Filter \"#{filter}\" is not allowed.", filter)
           end
         end
         functions.each do |function|
-          if !@allowed_functions.include?(function)
-            raise Twig::Sandbox::SecurityNotAllowedFunctionError.new(sprintf('Function "%s" is not allowed.', function), function)
+          unless @allowed_functions.include?(function)
+            raise Twig::Sandbox::SecurityNotAllowedFunctionError.new("Function \"#{function}\" is not allowed.", function)
           end
         end
       end
 
       def check_method_allowed(obj, method)
-          if obj.is_a?(Twig::Template) || obj.is_a?(Twig::Markup)
-            return true
+        if obj.is_a?(Twig::Template) || obj.is_a?(Twig::Markup)
+          return true
+        end
+        allowed = false
+        method = method.downcase
+        @allowed_methods.each do |klass, methods|
+          if obj.is_a?(klass)
+            allowed = methods.include?(method)
+            break
           end
-          allowed = false
-          method = method.downcase
-          @allowed_methods.each do |klass, methods|
-            if obj.is_a?(klass)
-              allowed = methods.include?(method)
-              break
-            end
-          end
-          unless allowed
-            raise Twig::Sandbox::SecurityError.new(sprintf('Calling "%s" method on a "%s" object is not allowed.', method, obj.class.name))
-          end
+        end
+        unless allowed
+          raise Twig::Sandbox::SecurityError.new(sprintf('Calling "%s" method on a "%s" object is not allowed.', method, obj.class.name))
+        end
       end
 
       def check_property_allowed(obj, property)
