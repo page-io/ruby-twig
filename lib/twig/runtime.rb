@@ -326,22 +326,23 @@ module Twig
     #   {# items now contains { 'apple': 'fruit', 'orange': 'fruit', 'peugeot': 'car' } #}
     #  </pre>
     #
-    #  @param array|Traversable arr1 An array
-    #  @param array|Traversable arr2 An array
+    #  @param arr1 [Array,Hash,#to_a] An object to merge
+    #  @param arr2 [Array,Hash,#to_a] An object to merge
     #
     #  @return array The merged array
     def self.twig_array_merge(arr1, arr2)
-      if arr1.is_a?(Traversable)
-        arr1 = iterator_to_array(arr1)
-      elsif !is_array(arr1)
-        raise Twig::Error::Runtime.new(sprintf('The merge filter only works with arrays or "Traversable", got "%s" as first argument.', gettype(arr1)))
+      if arr1.is_a?(::Hash)
+        unless arr2.is_a?(::Hash)
+          raise Twig::Error::Runtime.new("Can only merge an hash with another hash, got \"#{arr2.class}\" as second argument.")
+        end
+        return arr1.merge(arr2)
+      elsif !arr1.respond_to?(:to_a)
+        raise Twig::Error::Runtime.new("The merge filter only works with arrays or hash, got \"#{arr1.class}\" as first argument.")
       end
-      if arr2.is_a?(Traversable)
-        arr2 = iterator_to_array(arr2)
-      elsif !is_array(arr2)
-        raise Twig::Error::Runtime.new(sprintf('The merge filter only works with arrays or "Traversable", got "%s" as second argument.', gettype(arr2)))
+      if !arr2.respond_to?(:to_a)
+        raise Twig::Error::Runtime.new("The merge filter only works with arrays or hash, got \"#{arr2.class}\" as second argument.")
       end
-      array_merge(arr1, arr2)
+      arr1.to_a | arr2.to_a
     end
 
     #  Slices a variable.
