@@ -118,10 +118,11 @@ module Twig
               ex = Twig::Error::Syntax.new("Unknown \"#{token.value}\" tag.", token.lineno, filename)
               ex.add_suggestions(token.value, @environment.get_tags.keys)
             else
-              ex = Twig::Error::Syntax.new("Unexpected \"#{token.value()}\" tag", token.lineno, filename)
+              message = "Unexpected \"#{token.value}\" tag"
               if _test.is_a?(::Array) && _test.length > 0 && _test[0].is_a?(Twig::TokenParser)
-                ex.append_message(" (expecting closing tag for the \"#{_test[0].tag}\" tag defined near line #{lineno}).")
+                message << " (expecting closing tag for the \"#{_test[0].tag}\" tag defined near line #{lineno})."
               end
+              ex = Twig::Error::Syntax.new(message, token.lineno, filename)
             end
             raise ex
           end
