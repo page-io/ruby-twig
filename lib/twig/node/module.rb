@@ -223,7 +223,7 @@ module Twig
 
     def compile_display(compiler)
       compiler
-        .write("def do_display(_context, blocks = [])\n")
+        .write("def do_display(_context, blocks = {})\n")
         .indent
         .write("_twigout = []\n")
         .subcompile(get_node(:display_start))

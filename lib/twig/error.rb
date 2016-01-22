@@ -14,10 +14,10 @@ module Twig
     #
     # By default, automatic guessing is enabled.
     #
-    # @param string    $message  The error message
-    # @param int       lineno   The template line where the error occurred
-    # @param string    $filename The template file name where the error occurred
-    # @param Exception $previous The previous exception
+    # @param message [String]   The error message
+    # @param lineno [Intiger]   The template line where the error occurred
+    # @param filename [String]  The template file name where the error occurred
+    # @param nested [Exception] The previous exception
     def initialize(message, lineno = -1, filename = nil, nested = $!)
       super(message)
       @nested = nested
@@ -61,7 +61,7 @@ module Twig
 
     # Sets the template line where the error occurred.
     #
-    # @param int lineno The template line
+    # @param lineno [Integer] The template line
     def set_template_line(lineno)
       @lineno = lineno
       update_repr

@@ -920,12 +920,11 @@ module Twig
     end
 
     def init_extension(extension)
-      puts "debug: extension: #{extension.get_name}"
-
       # filters
       extension.get_filters.each do |filter|
         @filters[filter.get_name] = filter
       end
+
       # functions
       extension.get_functions.each do |function|
         @functions[function.name] = function

@@ -271,7 +271,6 @@ module Twig
         # return implode("\n", $source);
     end
 
-    # {@inheritdoc}
     def display(context, blocks = {})
       display_with_error_handling(@env.merge_globals(context), @blocks.merge(blocks))
     end
@@ -285,7 +284,7 @@ module Twig
       # end
     end
 
-    def display_with_error_handling(context, blocks = [])
+    def display_with_error_handling(context, blocks = {})
       begin
         do_display(context, blocks)
       rescue Twig::Error => ex
@@ -293,22 +292,17 @@ module Twig
           ex.set_template_file(get_template_name)
         end
         # this is mostly useful for Twig::Error::Loader exceptions
-        # see Twig_Error_Loader
+        # @see (Twig::Error::Loader)
+        #
         unless ex.get_template_line
           ex.set_template_line(-1)
           ex.guess
         end
         raise
       rescue => ex
-        raise Twig::Error::Runtime.new("An exception has been thrown during the rendering of a template (\"#{ex.message}\").", -1, get_template_name, ex)
+        raise Twig::Error::Runtime.new("An exception has been thrown during the rendering of template \"#{get_template_name}\" (\"#{ex.message}\").", -1, get_template_name, ex)
       end
     end
-
-    # # Auto-generated method to display the template with the given context.
-    # #
-    # # @param array context An array of parameters to pass to the template
-    # # @param array blocks  An array of blocks to pass to the template
-    # abstract protected function doDisplay(array context, array blocks = []);
 
     # Returns a variable from the context.
     #
@@ -334,7 +328,7 @@ module Twig
         if ignore_strict_check || !@env.is_strict_variables
           return
         end
-        raise Twig::Error::Runtime.new(sprintf('Variable "%s" does not exist', item), -1, get_template_name)
+        raise Twig::Error::Runtime.new("Variable \"#{item}\" does not exist", -1, get_template_name)
       end
       context[item]
     end
@@ -479,7 +473,7 @@ module Twig
       # useful when calling a template method from a template
       # this is not supported but unfortunately heavily used in the Symfony profiler
       if object.is_a?(Twig::Template)
-        return ret == '' ? '' : Twig::Markup.new(ret, @env.getCharset())
+        return ret == '' ? '' : Twig::Markup.new(ret, @env.get_charset)
       end
       ret
     end

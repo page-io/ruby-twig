@@ -33,7 +33,7 @@ module Twig
       end
     end
 
-    # Tests a token and returns it or throws a syntax error.
+    # Tests a token and returns it or raises a syntax error.
     #
     # @return Twig::Token
     def expect(type, value = nil, message = nil)
@@ -41,8 +41,9 @@ module Twig
       unless token.check(type, value)
         line = token.lineno
         message = message ? "#{message}. " : ''
-        value = value ? " with value \"#{value}\"" : ''
-        raise Twig::Error::Syntax.new("#{message}Unexpected token \"#{Twig::Token.type_to_english(token.type)}\" of value \"#{token.value}\" (\"#{Twig::Token.type_to_english(type)}\" expected#{value}).",
+        expected_value = value.nil? ? '' : " with value \"#{value}\""
+        current_value =  token.value.nil? ? '' : " of value \"#{token.value}\""
+        raise Twig::Error::Syntax.new("#{message}Unexpected token \"#{Twig::Token.type_to_english(token.type)}\"#{current_value} (\"#{Twig::Token.type_to_english(type)}\" expected#{expected_value}).",
           line,
           @filename
         )
