@@ -17,7 +17,7 @@ module Twig
     def compile(compiler)
       compiler
         .add_debug_info(self)
-        .write("_context['_parent'] = _context\n")
+        .write("_context['_parent'] = {}.merge(_context)\n")
         .write("_context['_seq'] = ")
         .subcompile(get_node(:seq))
         .raw("\n")
@@ -80,17 +80,15 @@ module Twig
           .write("end\n")
       end
 
-      compiler.write("_parent = _context['_parent']\n")
-
-      # remove some "private" loop variables (needed for nested loops)
+      compiler.write("_parent = _context.delete('_parent')\n")
+      # # remove some "private" loop variables (needed for nested loops)
       compiler.write("_context.delete('_seq')\n")
       compiler.write("_context.delete('_iterated')\n")
       compiler.write("_context.delete('#{get_node(:value_target).get_attribute('name')}')\n")
-      compiler.write("_context.delete('_parent')\n")
       compiler.write("_context.delete('loop')\n")
-
       # keep the values set in the inner context for variables defined in the outer context
-      # compiler.write("_context &= _parent\n")
+      compiler.write("_context = _parent\n")
+
     end
   end
 end
