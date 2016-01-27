@@ -481,5 +481,12 @@ module Twig
     def call_user_func(callable, *args)
       callable[0].send(callable[1].to_sym, args)
     end
+
+    def merge_context(parent, context)
+      parent.keys.each do |key|
+        parent[key] = context[key] if context.key?(key)
+      end
+      parent
+    end
   end
 end
