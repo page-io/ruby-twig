@@ -121,10 +121,10 @@ module Twig
     #    {{ post.published_at|date("m/d/Y") }}
     #  </pre>
     #
-    #  @param env [Twig::Environment]                 A Twig::Environment instance
-    #  @param date [DateTime|DateInterval|string]     A date
-    #  @param string|nil                              format   The target (PHP) format, nil to use the default
-    #  @param DateTimeZone|string|nil|false           timezone The target timezone, nil to use the default, false to leave unchanged
+    #  @param env [Twig::Environment]                   A Twig::Environment instance
+    #  @param date [DateTime,DateInterval,string]       A date
+    #  @param format [String,nil]                       The target (PHP) format, nil to use the default
+    #  @param timezone [DateTimeZone,String,nil,false]  The target timezone, nil to use the default, false to leave unchanged
     #
     #  @return string The formatted date
     def self.twig_date_format_filter(env, date, format = nil, timezone = nil)
@@ -136,7 +136,10 @@ module Twig
         format = env.get_extension('core').get_date_format
       end
       format = format.gsub(DATE_FORMAT_CONVERTER_REGEXP,DATE_FORMAT_CONVERTER)
-
+      if format.include?('%!')
+        # String includes unsupported formats
+        format.gsub!(/%!([SztLBeIZ])/,'\1')
+      end
       twig_date_converter(env, date, timezone).strftime(format)
     end
 
@@ -820,7 +823,7 @@ module Twig
     #
     #  @return bool true if the value is empty, false otherwise
     def self.twig_test_empty(value)
-      if value.is_a?(Countable)
+      if value.respond_to?(:length)
         return 0 == value.length
       end
       '' == value || false == value || nil == value || [] == value
@@ -839,7 +842,7 @@ module Twig
     #
     #  @return bool true if the value is traversable
     def self.twig_test_iterable(value)
-      value.responds_to?(:each)
+      value.respond_to?(:each)
     end
 
     #  Renders a template.
