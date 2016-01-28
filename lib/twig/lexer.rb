@@ -285,10 +285,11 @@ module Twig
 
       def calculate_lineno
         # TODO! check this, the line is calculated from the position at the end of the expression
-        if @line_start < @ss.pos
-          @lineno += @code[@line_start..@ss.pos-1].count("\n")
-          @line_start = @ss.pos
-        elsif @line_start > @ss.pos
+        while @line_start < @ss.pos
+          @lineno += 1 if @code.byteslice(@line_start) == "\n"
+          @line_start += 1
+        end
+        if @line_start > @ss.pos
           raise "can't go back"
         end
         @lineno
