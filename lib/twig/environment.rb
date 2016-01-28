@@ -371,13 +371,11 @@ module Twig
       raise Twig::Error::Loader.new("Unable to find one of the following templates: \"#{names.join(',')}\".")
     end
 
-    # # Clears the internal template cache.
-    # #
-    # # @deprecated since 1.18.3 (to be removed in 2.0)
-    # def clearTemplateCache()
-    #     @trigger_error(sprintf('The %s method is deprecated and will be removed in Twig 2.0.', __METHOD__), E_USER_DEPRECATED);
-    #     @loaded_templates = [];
-    # end
+    # Clears the internal template cache.
+    #
+    def clear_template_cache()
+      @loaded_templates = []
+    end
 
     # # Clears the template cache files on the filesystem.
     # #
@@ -662,7 +660,7 @@ module Twig
     #
     # @param filter [Twig::SimpleFilter] A Twig::SimpleFilter instance
     def add_filter(filter)
-      name = filter.get_name
+      name = filter.name
       if @extension_initialized
         raise Twig::LogicException.new("Unable to add filter \"#{name}\" as extensions have already been initialized.")
       end
@@ -821,14 +819,14 @@ module Twig
     # @param string name  The global name
     # @param mixed  value The global value
     def add_global(name, value)
-      if (@extension_initialized || @runtime_initialized)
+      if @extension_initialized || @runtime_initialized
         @globals ||= init_globals
 
-        if !@globals.key?(name)
+        unless @globals.key?(name)
           raise Twig::LogicException.new("Unable to add global \"#{name}\" as the runtime or the extensions have already been initialized.")
         end
       end
-      if (@extension_initialized || @runtime_initialized)
+      if @extension_initialized || @runtime_initialized
         # update the value
         @globals[name] = value
       else
@@ -886,7 +884,7 @@ module Twig
     # end
 
     def init_globals
-      globals = []
+      globals = {}
       @extensions.each do |name, extension|
         # if !extension.is_a?(Twig::Extension::GlobalsInterface)
         #   m = ReflectionMethod.new(extension, 'getGlobals')
@@ -895,13 +893,12 @@ module Twig
         #   end
         # end
         ext_glob = extension.get_globals
-        if !ext_glob.is_a?(::Array)
+        unless ext_glob.is_a?(::Hash)
           # raise UnexpectedValueException.(sprintf('"%s::getGlobals()" must return an array of globals.', extension.class.name));
         end
-        globals << ext_glob
+        globals.merge!(ext_glob)
       end
-      globals << @staging.get_globals
-      # call_user_func_array('array_merge', globals);
+      globals.merge!(@staging.get_globals)
     end
 
     def init_extensions
