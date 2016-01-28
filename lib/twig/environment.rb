@@ -282,7 +282,9 @@ module Twig
       #       @cache.write(key, content)
       #     end
 
+          if is_debug
           puts content
+          end
           eval(content)
       #   end
       # end
