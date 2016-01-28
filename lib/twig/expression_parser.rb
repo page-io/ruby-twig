@@ -37,20 +37,20 @@ module Twig
         expr = parse_expression(operator['precedence'])
         klass = operator['class']
         return parse_postfix_expression(klass.new(expr, token.lineno))
-      elsif token.check(:punctuation_type, '(')
+      elsif token.check(:punctuation_type, '('.freeze)
         @parser.stream.next
         expr = parse_expression
-        @parser.stream.expect(:punctuation_type, ')', 'An opened parenthesis is not properly closed')
+        @parser.stream.expect(:punctuation_type, ')'.freeze, 'An opened parenthesis is not properly closed')
         return parse_postfix_expression(expr)
       end
       parse_primary_expression
     end
 
     def parse_conditional_expression(expr)
-      while @parser.stream.next_if(:punctuation_type, '?')
-        if !@parser.stream.next_if(:punctuation_type, ':')
+      while @parser.stream.next_if(:punctuation_type, '?'.freeze)
+        if !@parser.stream.next_if(:punctuation_type, ':'.freeze)
           expr2 = parse_expression
-          if @parser.stream.next_if(:punctuation_type, ':')
+          if @parser.stream.next_if(:punctuation_type, ':'.freeze)
             expr3 = parse_expression
           else
             expr3 = Twig::Node::Expression::Constant.new('', @parser.current_token.lineno)
@@ -78,14 +78,14 @@ module Twig
       when :name_type
         @parser.stream.next
         case token.value
-        when 'true','TRUE'
+        when 'true'.freeze,'TRUE'.freeze
           node = Twig::Node::Expression::Constant.new(true, token.lineno)
-        when 'false','FALSE'
+        when 'false'.freeze,'FALSE'.freeze
           node = Twig::Node::Expression::Constant.new(false, token.lineno)
-        when 'none','NONE','null','NULL'
+        when 'none'.freeze,'NONE'.freeze,'null'.freeze,'NULL'.freeze
           node = Twig::Node::Expression::Constant.new(nil, token.lineno)
         else
-          if '(' == @parser.current_token.value
+          if '('.freeze == @parser.current_token.value
             node = get_function_node(token.value, token.lineno)
           else
             node = Twig::Node::Expression::Name.new(token.value, token.lineno)
@@ -122,7 +122,7 @@ module Twig
         elsif token.check(:punctuation_type, '{')
           node = parse_hash_expression
         else
-          Twig::Error::Syntax.new("Unexpected token \"#{Twig::Token.type_to_english(token.type)}\" of value \"#{token.value}\".", token.lineno, @parser.filename)
+          raise Twig::Error::Syntax.new("Unexpected token \"#{Twig::Token.type_to_english(token.type)}\" of value \"#{token.value}\".", token.lineno, @parser.filename)
         end
       end
       parse_postfix_expression(node)
@@ -372,7 +372,7 @@ module Twig
           value = parse_expression
         end
         name = nil
-        if (named_arguments && token = stream.next_if(:operator_type, '='))
+        if named_arguments && token = stream.next_if(:operator_type, '=')
           unless value.is_a?(Twig::Node::Expression::Name)
             raise Twig::Error::Syntax.new("A parameter name must be a string, \"#{value.class.name}\" given.", token.lineno, @parser.filename)
           end
@@ -436,7 +436,7 @@ module Twig
       end
       if function.is_a?(Twig::SimpleFunction)
         if function.deprecated?
-          message = "Twig Function \"#{function.get_name}\" is deprecated"
+          message = "Twig function \"#{function.name}\" is deprecated"
           if function.get_alternative
             message << ". Use \"#{function.get_alternative}\" instead"
           end
@@ -450,13 +450,13 @@ module Twig
 
     def get_filter_node_class(name, line)
       env = @parser.environment
-      if !(filter = env.get_filter(name))
+      unless filter = env.get_filter(name)
         ex = Twig::Error::Syntax.new("Unknown \"#{name}\" filter.", line, @parser.filename)
         ex.add_suggestions(name, env.get_filters.keys)
         raise ex
       end
       if filter.is_a?(Twig::SimpleFilter) && filter.deprecated?
-        message = "Twig Filter \"#{filter.get_name}\" is deprecated"
+        message = "Twig Filter \"#{filter.name}\" is deprecated"
         if filter.get_alternative
           message << ". Use \"#{filter.get_alternative}\" instead"
         end

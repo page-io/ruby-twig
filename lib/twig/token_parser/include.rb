@@ -2,7 +2,7 @@ module Twig
   class TokenParser::Include < Twig::TokenParser
 
     def parse(token)
-      expr = @parser.get_expression_parser.parse_expression
+      expr = @parser.expression_parser.parse_expression
       variables, only, ignore_missing = parse_arguments
       Twig::Node::Include.new(expr, variables, only, ignore_missing, token.lineno, tag)
     end
@@ -16,7 +16,7 @@ module Twig
       end
       variables = nil
       if stream.next_if(:name_type, 'with'.freeze)
-        variables = @parser.get_expression_parser.parse_expression
+        variables = @parser.expression_parser.parse_expression
       end
       only = false
       if (stream.next_if(:name_type, 'only'.freeze))

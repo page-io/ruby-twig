@@ -3,7 +3,7 @@ module Twig
 
     def parse(token)
       stream = @parser.stream
-      parent = @parser.get_expression_parser.parse_expression
+      parent = @parser.expression_parser.parse_expression
       variables, only, ignore_missing = parse_arguments
       # inject a fake parent to make the parent() function work
       stream.inject_tokens([

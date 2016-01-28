@@ -112,13 +112,14 @@ module Twig
       end
 
       # manage named arguments
-      callable_parameters = get_callable_parameters(callable, is_variadic).map{|x| x[1]=x[1].to_s; x}
+      callable_parameters = get_callable_parameters(callable).map{|x| x[1]=x[1].to_s; x}
 
       arguments = []
       names = []
       missing_arguments = []
       optional_arguments = []
       pos = 0;
+
       callable_parameters.each do |callable_parameter|
         name = callable_parameter[1]
         names << name
@@ -129,7 +130,7 @@ module Twig
           end
 
           if missing_arguments.any?
-            raise Twig::Error::Syntax.new("Argument \"#{name}\" could not be assigned for #{call_type} \"#{call_name}(#{names.join(', ')})\" because it is mapped to an internal PHP function which cannot determine default value for optional argument#{missing_arguments.length > 1 ? 's' : ''} \"#{missing_arguments.join(', ')}\".")
+            raise Twig::Error::Syntax.new("Argument \"#{name}\" could not be assigned for #{call_type} \"#{call_name}(#{names.join(', ')})\" because it is mapped to a function which cannot determine default value for optional argument#{missing_arguments.length > 1 ? 's' : ''} \"#{missing_arguments.join(', ')}\".")
           end
           arguments |= optional_arguments
           arguments << parameters[name]
@@ -218,12 +219,12 @@ module Twig
         end
       end
 
-      def get_callable_parameters(callable, is_variadic=nil)
+      def get_callable_parameters(callable)
         r = get_callable_method(callable)
 
         parameters = r.parameters
 
-        if has_node('node') # TODO! chech this!
+        if has_node('node') # TODO! check this!
           parameters.shift
         end
         if has_attribute(:needs_environment) && get_attribute(:needs_environment)
@@ -232,24 +233,11 @@ module Twig
         if has_attribute(:needs_context) && get_attribute(:needs_context)
           parameters.shift
         end
-        if has_attribute('arguments') && nil != get_attribute('arguments')
+        if has_attribute('arguments') && !get_attribute('arguments').nil?
           get_attribute('arguments').each do |argument|
             parameters.shift
           end
         end
-        # if is_variadic
-        #   argument = parameters.last
-        #   if (argument && argument.is[] && argument.is_default_value_available && [] == argument.get_default_value)
-        #     parameters.pop
-        #   else
-        #     callable_name = r.name
-        #     if r.get_declaring_class
-        #       callable_name = r.get_declaring_class.name + '::' + callable_name
-        #     end
-        #
-        #     raise LogicException.new("The last parameter of \"#{callable_name}\" for #{get_attribute(:type)} \"#{get_attribute('name')}\" must be an array with default value, eg. \"array $arg = []\"\.")
-        #   end
-        # end
         parameters
       end
 

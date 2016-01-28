@@ -190,6 +190,5 @@ module Twig
      nested.respond_to?(:raw_backtrace) ? nested.raw_backtrace : nested.backtrace
     end
 
-
   end
 end

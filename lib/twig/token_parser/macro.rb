@@ -5,7 +5,7 @@ module Twig
       lineno = token.lineno
       stream = @parser.stream
       name = stream.expect(:name_type).value
-      arguments = @parser.get_expression_parser.parse_arguments(true, true)
+      arguments = @parser.expression_parser.parse_arguments(true, true)
       stream.expect(:block_end_type)
       @parser.push_local_scope
       body = @parser.subparse([self, :decide_block_end], true)

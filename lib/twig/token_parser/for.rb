@@ -4,12 +4,12 @@ module Twig
     def parse(token)
       lineno = token.lineno
       stream = @parser.stream
-      targets = @parser.get_expression_parser.parse_assignment_expression
+      targets = @parser.expression_parser.parse_assignment_expression
       stream.expect(:operator_type, 'in')
-      seq = @parser.get_expression_parser.parse_expression
+      seq = @parser.expression_parser.parse_expression
       ifexpr = nil
       if stream.next_if(:name_type, 'if')
-        ifexpr = @parser.get_expression_parser.parse_expression;
+        ifexpr = @parser.expression_parser.parse_expression;
       end
       stream.expect(:block_end_type)
       body = @parser.subparse([self, :decide_for_fork])

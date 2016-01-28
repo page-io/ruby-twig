@@ -242,7 +242,7 @@ module Twig
         klass = get_test_node_class(parser, test)
         arguments = nil
         if stream.check(:punctuation_type, '(')
-          arguments = parser.get_expression_parser.parse_arguments(true)
+          arguments = parser.expression_parser.parse_arguments(true)
         end
         klass.new(node, name, arguments, parser.current_token.lineno)
       end

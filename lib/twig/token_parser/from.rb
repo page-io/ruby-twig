@@ -2,7 +2,7 @@ module Twig
   class TokenParser::From < Twig::TokenParser
 
     def parse(token)
-      macro = @parser.get_expression_parser.parse_expression
+      macro = @parser.expression_parser.parse_expression
       stream = @parser.stream
       stream.expect('import'.freeze)
       targets = {}

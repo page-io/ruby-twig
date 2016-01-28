@@ -21,7 +21,7 @@ module Twig
         end
       else
         body = Twig::Node.new([
-          Twig::Node::Print.new(@parser.get_expression_parser.parse_expression, lineno)
+          Twig::Node::Print.new(@parser.expression_parser.parse_expression, lineno)
         ])
       end
       stream.expect(:block_end_type)

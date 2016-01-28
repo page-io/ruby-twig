@@ -3,7 +3,7 @@ require 'securerandom'
 module Twig
   class Parser
 
-    attr_reader :environment, :stream
+    attr_reader :environment, :stream, :expression_parser
     attr_accessor :parent
 
     # Constructor.
@@ -85,7 +85,6 @@ module Twig
 
       while !@stream.eos?
         token_type = current_token.type
-
         case token_type
         when :text_type
           token = @stream.next
@@ -236,13 +235,6 @@ module Twig
 
     def pop_local_scope
       @imported_symbols.shift
-    end
-
-    # Gets the expression parser.
-    #
-    # @return Twig_ExpressionParser The expression parser
-    def get_expression_parser
-      @expression_parser
     end
 
     # Gets the current token.

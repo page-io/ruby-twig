@@ -7,7 +7,7 @@ module Twig
       if stream.check(:block_end_type)
         value = 'html'
       else
-        expr = @parser.get_expression_parser.parse_expression
+        expr = @parser.expression_parser.parse_expression
         unless expr.is_a?(Twig::Node::Expression::Constant)
           raise Twig::Error::Syntax.new('An escaping strategy must be a string or a bool.', stream.current_token.lineno, stream.filename)
         end

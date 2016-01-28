@@ -4,7 +4,7 @@ module Twig
     def parse(token)
       name = @parser.get_var_name
       ref = Twig::Node::Expression::BlockReference.new(Twig::Node::Expression::Constant.new(name, token.lineno), true, token.lineno, tag)
-      filter = @parser.get_expression_parser.parse_filter_expression_raw(ref, tag)
+      filter = @parser.expression_parser.parse_filter_expression_raw(ref, tag)
       @parser.stream.expect(:block_end_type)
       body = @parser.subparse([self, :decide_block_end], true)
       @parser.stream.expect(:block_end_type)

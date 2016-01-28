@@ -8,7 +8,7 @@ module Twig
       if @parser.parent
         raise Twig::Error::Syntax.new('Multiple extends tags are forbidden.', token.lineno, @parser.filename)
       end
-      @parser.parent = @parser.get_expression_parser.parse_expression
+      @parser.parent = @parser.expression_parser.parse_expression
       @parser.stream.expect(:block_end_type)
       nil
     end

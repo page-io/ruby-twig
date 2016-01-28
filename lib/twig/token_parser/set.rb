@@ -4,10 +4,10 @@ module Twig
     def parse(token)
       lineno = token.lineno
       stream = @parser.stream
-      names = @parser.get_expression_parser.parse_assignment_expression
+      names = @parser.expression_parser.parse_assignment_expression
       capture = false
       if stream.next_if(:operator_type, '=')
-        values = @parser.get_expression_parser.parse_multitarget_expression
+        values = @parser.expression_parser.parse_multitarget_expression
         stream.expect(:block_end_type)
         if names.length != values.length
           raise Twig::Error::Syntax.new('When using set, you must have the same number of variables and assignments.', stream.current_token.lineno, stream.filename)
