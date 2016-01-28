@@ -410,10 +410,11 @@ module Twig
     #
     #  @return string The concatenated string
     def self.twig_join_filter(value, glue = '')
-      if value.is_a?(Traversable)
-        value = iterator_to_array(value, false)
+      if value.is_a?(::Array)
+        value.join(glue)
+      elsif value.is_a?(::Hash)
+        value.values.join(glue)
       end
-      return implode(glue, value.to_a)
     end
 
     #  Splits the string into an array.
