@@ -464,7 +464,7 @@ module Twig
     # // a function call is cheaper.
 
     #  @internal
-    def _twig_default_filter(value, default = '')
+    def self._twig_default_filter(value, default = '')
       if (twig_test_empty(value))
         return default;
       end

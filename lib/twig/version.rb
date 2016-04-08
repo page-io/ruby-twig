@@ -1,4 +1,4 @@
 # encoding: utf-8
 module Twig
-  VERSION = "0.1.0.alpha.11"
+  VERSION = "0.1.0.alpha.12"
 end

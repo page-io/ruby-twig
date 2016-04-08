@@ -146,7 +146,7 @@ module Twig
           Twig::SimpleFilter.new('first', 'Twig::Runtime.twig_first', {needs_environment: true}),
           Twig::SimpleFilter.new('last', 'Twig::Runtime.twig_last', {needs_environment: true}),
           # iteration and runtime
-          Twig::SimpleFilter.new('default', '_twig_default_filter', {:node_class => Twig::Node::Expression::Filter::Default}),
+          Twig::SimpleFilter.new('default', 'Twig::Runtime._twig_default_filter', {:node_class => Twig::Node::Expression::Filter::Default}),
           Twig::SimpleFilter.new('keys', 'Twig::Runtime.twig_get_array_keys_filter'),
           # escaping
           Twig::SimpleFilter.new('escape', 'Twig::Runtime.twig_escape_filter', {needs_environment: true, is_safe_callback: 'twig_escape_filter_is_safe'}),
