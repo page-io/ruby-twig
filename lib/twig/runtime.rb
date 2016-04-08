@@ -433,42 +433,24 @@ module Twig
     #   {# returns [aa, bb, cc] #}
     #  </pre>
     #
-    #  @param Twig_Environment env       A Twig_Environment instance
-    #  @param string           value     A string
-    #  @param string           delimiter The delimiter
-    #  @param int              limit     The limit
+    #  @param [Twig::Environment] env      A Twig::Environment instance
+    #  @param String              value     A string
+    #  @param String              delimiter The delimiter
+    #  @param int                 limit     The limit
     #
     #  @return array The split string as an array
     def self.twig_split_filter(env, value, delimiter, limit = nil)
-      unless empty(delimiter)
-        return nil == limit ? explode(delimiter, value) : explode(delimiter, value, limit)
+      unless delimiter.empty?
+        return nil == limit ? value.split(delimiter) : value.split(delimiter, limit)
       end
-      unless function_exists('mb_get_info') || nil == charset = env.get_charset
-        return str_split(value, nil == limit ? 1 : limit)
+      if nil == limit || limit <= 1
+        return value.split ''
       end
-      if limit <= 1
-        return preg_split('/(?<!^)(?!$)/u', value)
-      end
-      length = mb_strlen(value, charset);
-      if length < limit
-        return array(value)
-      end
-      r = []
-      (0..length-1).each do |i|
-        r << mb_substr(value, i, limit, charset)
-      end
-      r
+      value.scan(/.{1,#{limit.to_i}}/)
     end
-    # // The '_default' filter is used internally to avoid using the ternary operator
-    # // which costs a lot for big contexts (before PHP 5.4). So, on average,
-    # // a function call is cheaper.
 
-    #  @internal
-    def self._twig_default_filter(value, default = '')
-      if (twig_test_empty(value))
-        return default;
-      end
-      return value;
+    def self.twig_default_filter(value, default = '')
+      value.empty? ? default : value
     end
 
     #  Returns the keys for the given array.

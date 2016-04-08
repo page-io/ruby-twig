@@ -128,8 +128,8 @@ module Twig
           # string filters
           Twig::SimpleFilter.new('title', 'Twig::Runtime.twig_title_string_filter'),
           Twig::SimpleFilter.new('capitalize', 'Twig::Runtime.twig_capitalize_string_filter', {needs_environment: true}),
-          Twig::SimpleFilter.new('upper', 'twig_upper'),
-          Twig::SimpleFilter.new('lower', 'twig_lower'),
+          Twig::SimpleFilter.new('upper', 'Twig::Runtime.twig_upper_filter'),
+          Twig::SimpleFilter.new('lower', 'Twig::Runtime.twig_lower_filter'),
           Twig::SimpleFilter.new('striptags', 'twig_striptags'),
           Twig::SimpleFilter.new('trim', 'twig_trim'),
           Twig::SimpleFilter.new('nl2br', 'twig_nl2br', {pre_escape: 'html', is_safe: ['html']}),
@@ -146,7 +146,7 @@ module Twig
           Twig::SimpleFilter.new('first', 'Twig::Runtime.twig_first', {needs_environment: true}),
           Twig::SimpleFilter.new('last', 'Twig::Runtime.twig_last', {needs_environment: true}),
           # iteration and runtime
-          Twig::SimpleFilter.new('default', 'Twig::Runtime._twig_default_filter', {:node_class => Twig::Node::Expression::Filter::Default}),
+          Twig::SimpleFilter.new('default', 'Twig::Runtime.twig_default_filter'),
           Twig::SimpleFilter.new('keys', 'Twig::Runtime.twig_get_array_keys_filter'),
           # escaping
           Twig::SimpleFilter.new('escape', 'Twig::Runtime.twig_escape_filter', {needs_environment: true, is_safe_callback: 'twig_escape_filter_is_safe'}),
