@@ -769,7 +769,7 @@ module Twig
     #
     # @return string The titlecased string
     #
-    def self.twig_title_string_filter(env, string)
+    def self.twig_title_string_filter(string)
       string.downcase.gsub(/\b(?<!['â`])[a-z]/) { $&.capitalize }
     end
 
