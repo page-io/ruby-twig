@@ -919,7 +919,7 @@ module Twig
     end
 
     #  Returns absolute value of a given number.
-    #  Returned number  will be of same type as given value (number or float)
+    #  Returned number will be of same type as given value (number or float)
     #
     #  @param mixed value A numeric value
     #
@@ -929,6 +929,18 @@ module Twig
         return value.abs
       end
       return nil
+    end
+
+    #  Gives a range of values starting at start_value and ending at end_value, in numerical order
+    #  Both start_value and end_value will be consider as possible parts of the range
+    #
+    #  @param int start_value Number to start range of values at
+    #  @param int end_value Number to end range of values at
+    #  @param int step Returned range values will skip step by step
+    #
+    #  @return array
+    def self.twig_range(start_value, end_value, step = 1)
+      Range.new(start_value,end_value).step(step).to_a
     end
   end
 end

@@ -158,7 +158,7 @@ module Twig
         [
           Twig::SimpleFunction.new('max', 'twig_max'),
           Twig::SimpleFunction.new('min', 'twig_min'),
-          Twig::SimpleFunction.new('range', 'twig_range'),
+          Twig::SimpleFunction.new('range', 'Twig::Runtime.twig_range'),
           Twig::SimpleFunction.new('constant', 'Twig::Runtime.twig_constant'),
           Twig::SimpleFunction.new('cycle', 'Twig::Runtime.twig_cycle'),
           Twig::SimpleFunction.new('random', 'Twig::Runtime.twig_random', {needs_environment: true}),

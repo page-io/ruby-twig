@@ -3,7 +3,7 @@ module Twig
 
     def compile(compiler)
       compiler
-        .raw('range(')
+        .raw('Twig::Runtime.twig_range(')
         .subcompile(get_node('left'))
         .raw(', ')
         .subcompile(get_node('right'))
