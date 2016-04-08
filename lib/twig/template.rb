@@ -356,7 +356,7 @@ module Twig
           return is_defined_test ? true : object[item]
         end
 
-        if :array_call == call_type || !object.is_a?(Object)
+        if :array_call == call_type
           if is_defined_test
             return false
           end
@@ -404,7 +404,7 @@ module Twig
       end
 
       # object property
-      if :method_call != call_type && !object.is_a?(self.class) # Twig_Template does not have public properties, and we don't want to allow access to internal ones
+      if :method_call != call_type && !object.is_a?(self.class) # Twig::Template does not have public properties, and we don't want to allow access to internal ones
         if object.respond_to?(item.to_sym)
           if is_defined_test
             return true
@@ -412,7 +412,8 @@ module Twig
           if @env.has_extension('sandbox')
             @env.get_extension('sandbox').check_property_allowed(object, item)
           end
-          return object.item
+          #!TODO check this
+          return object.public_send(item.to_sym)
         end
       end
       klass = object.class

@@ -132,6 +132,8 @@ module Twig
       #   return twig_date_interval_format_filter(env, date_interval, format, timezone)
       # end
 
+      date = Date.today if date.nil?
+
       if format.nil?
         format = env.get_extension('core').get_date_format
       end
@@ -450,7 +452,7 @@ module Twig
     end
 
     def self.twig_default_filter(value, default = '')
-      value.blank? ? default : value
+      value.nil? ? default : value
     end
 
     #  Returns the keys for the given array.
@@ -752,13 +754,35 @@ module Twig
     #
     # Returns the length of a variable.
     #
-    # @param Twig_Environment env   A Twig_Environment instance
+    # @param Twig::Environment env   A Twig::Environment instance
     # @param mixed            thing A variable
     #
     # @return int The length of the value
     #
     def self.twig_length_filter(env, thing)
-      thing.length
+      thing.respond_to?(:length) ? thing.length : 0
+    end
+
+    #
+    # Returns the length of a variable.
+    #
+    # @param [String]            A string variable
+    #
+    # @return [String] Returns the string with all letters in upper case
+    #
+    def self.twig_upper_filter(string)
+      string.upcase
+    end
+
+    #
+    # Returns the length of a variable.
+    #
+    # @param [String]            A string variable
+    #
+    # @return [String] Returns the string with all letters in down case
+    #
+    def self.twig_lower_filter(string)
+      string.downcase
     end
 
     #
