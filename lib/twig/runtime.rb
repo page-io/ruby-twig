@@ -917,5 +917,18 @@ module Twig
       end
       sliced_array
     end
+
+    #  Returns absolute value of a given number.
+    #  Returned number  will be of same type as given value (number or float)
+    #
+    #  @param mixed value A numeric value
+    #
+    #  @return mixed
+    def self.twig_abs(value)
+      if value.is_a?(Numeric)
+        return value.abs
+      end
+      return nil
+    end
   end
 end

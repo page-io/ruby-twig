@@ -119,7 +119,7 @@ module Twig
           Twig::SimpleFilter.new('format', 'twig_format'),
           Twig::SimpleFilter.new('replace', 'Twig::Runtime.twig_replace_filter'),
           Twig::SimpleFilter.new('number_format', 'Twig::Runtime.twig_number_format_filter', {needs_environment: true}),
-          Twig::SimpleFilter.new('abs', 'twig_abs'),
+          Twig::SimpleFilter.new('abs', 'Twig::Runtime.twig_abs'),
           Twig::SimpleFilter.new('round', 'Twig::Runtime.twig_round'),
           # encoding
           Twig::SimpleFilter.new('url_encode', 'Twig::Runtime.twig_urlencode_filter'),
