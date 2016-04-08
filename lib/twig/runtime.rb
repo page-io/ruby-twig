@@ -450,7 +450,7 @@ module Twig
     end
 
     def self.twig_default_filter(value, default = '')
-      value.empty? ? default : value
+      value.blank? ? default : value
     end
 
     #  Returns the keys for the given array.
