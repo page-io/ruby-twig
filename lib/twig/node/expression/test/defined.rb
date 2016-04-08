@@ -23,7 +23,7 @@ module Twig
     end
 
     def change_ignore_strict_check(node)
-      node.setAttribute(:ignore_strict_check, true)
+      node.set_attribute(:ignore_strict_check, true)
 
       if node.get_node('node').is_a?(Twig::Node::Expression::GetAttr)
         change_ignore_strict_check(node.get_node('node'))
