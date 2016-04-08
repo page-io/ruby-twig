@@ -1,0 +1,13 @@
+{% block head -%} This is a head {%- endblock %}
+
+{% for a,b in {a: 1, b:2} %}
+ <i>{{a}}</i>
+{% endfor %}
+
+{% for a in [] %}
+  error
+{% else %}
+  empty
+{% endfor %}
+
+{{ block("head") }}
