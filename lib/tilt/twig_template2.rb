@@ -24,7 +24,7 @@ module Tilt
           loader,
           Twig::Loader::Filesystem.new(options['paths'])
         ])
-      elsif defined? @@loader
+      elsif !@@loader.nil?
         loader = Twig::Loader::Chain.new([
           loader,
           @@loader
