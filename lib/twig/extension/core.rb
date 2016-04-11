@@ -131,7 +131,7 @@ module Twig
           Twig::SimpleFilter.new('upper', 'Twig::Runtime.twig_upper_filter'),
           Twig::SimpleFilter.new('lower', 'Twig::Runtime.twig_lower_filter'),
           Twig::SimpleFilter.new('striptags', 'twig_striptags'),
-          Twig::SimpleFilter.new('trim', 'twig_trim'),
+          Twig::SimpleFilter.new('trim', 'Twig::Runtime.twig_trim'),
           Twig::SimpleFilter.new('nl2br', 'twig_nl2br', {pre_escape: 'html', is_safe: ['html']}),
           # array helpers
           Twig::SimpleFilter.new('join', 'Twig::Runtime.twig_join_filter'),

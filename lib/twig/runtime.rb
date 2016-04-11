@@ -966,5 +966,27 @@ module Twig
     def self.twig_range(start_value, end_value, step = 1)
       Range.new(start_value,end_value).step(step).to_a
     end
+
+    #  The trim filter strips whitespace (or other characters) from the beginning and end of a string
+    #
+    #  <pre>
+    #   {{ '  I like Twig.  '|trim }}
+    #   {# outputs 'I like Twig.' #}
+    #
+    #   {{ '  I like Twig.'|trim('.') }}
+    #   {# outputs '  I like Twig' #}
+    #  </pre>
+    #
+    #  @param string item String to be trimmed
+    #  @param string mask Characters to be stripped from string
+    #
+    #  @return string
+    def self.twig_trim(item, mask = " \t\n\r\0\x0B")
+      if item.is_a?(::String) and mask.is_a?(::String)
+        mask_source = Regexp.escape(mask)
+        return item.gsub(/\A([#{mask_source}])*|([#{mask_source}])*\Z/, '')
+      end
+      return nil
+    end
   end
 end
