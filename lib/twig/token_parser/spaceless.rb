@@ -3,9 +3,9 @@ module Twig
 
     def parse(token)
       @parser.stream.expect(:block_end_type)
-      body = @parser.subparse([self, :decide_spaceless_end], true)
+      body = @parser.subparse([self, :decide_block_end], true)
       @parser.stream.expect(:block_end_type)
-      Twig::Node::Spaceless(body, token.lineno, tag)
+      Twig::Node::Spaceless.new(body, token.lineno, tag)
     end
 
     def decide_block_end(token)

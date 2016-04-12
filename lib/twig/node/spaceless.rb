@@ -8,13 +8,11 @@ module Twig
     def compile(compiler)
       compiler
         .add_debug_info(self)
-        .write("_twigout << begin\n")
+        .write("_twigout << [].tap{ |_twigout| \n")
         .indent
-        .write("_twigout = ''\n")
         .subcompile(get_node(:body))
-        .write("_twigout.gsub(/>\s+</, '><')\n")
         .outdent
-        .write("end\n")
+        .write("}.join.gsub(/>\\s+</, '><')\n")
     end
 
   end
