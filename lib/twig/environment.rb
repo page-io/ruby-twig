@@ -282,8 +282,8 @@ module Twig
       #       @cache.write(key, content)
       #     end
 
-          if is_debug
-          puts content
+          if is_debug && ENV['TWIG_DUMP_COMPILE_SOURCE']
+            puts content
           end
           eval(content)
       #   end
