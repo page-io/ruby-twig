@@ -7,11 +7,8 @@ module Twig
     #  @param int               $position The cycle position
     #
     #  @return string The next value in the cycle
-    def self.twig_cycle(values, position)
-      unless is_array(values) && !values.is_a?(ArrayAccess)
-        return values
-      end
-      values[position % values.length]
+    def self.twig_cycle_function(values, position)
+      values.respond_to?(:[]) && values.respond_to?(:length) ? values[position % values.length] : values
     end
 
     MAX_RANDOM = 2147483647

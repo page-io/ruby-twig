@@ -160,7 +160,7 @@ module Twig
           Twig::SimpleFunction.new('min', 'twig_min'),
           Twig::SimpleFunction.new('range', 'Twig::Runtime.twig_range'),
           Twig::SimpleFunction.new('constant', 'Twig::Runtime.twig_constant'),
-          Twig::SimpleFunction.new('cycle', 'Twig::Runtime.twig_cycle'),
+          Twig::SimpleFunction.new('cycle', 'Twig::Runtime.twig_cycle_function'),
           Twig::SimpleFunction.new('random', 'Twig::Runtime.twig_random', {needs_environment: true}),
           Twig::SimpleFunction.new('date', 'Twig::Runtime.twig_date_converter', {needs_environment: true}),
           Twig::SimpleFunction.new('include', 'Twig::Runtime.twig_include', {needs_environment: true, needs_context: true, is_safe: ['all']}),
