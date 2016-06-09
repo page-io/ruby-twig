@@ -119,9 +119,3 @@ Dir["#{__dir__}/twig/loader/*.rb"].each { |f| require f }
 # Dir["#{__dir__}/twig/node/expression/*.rb"].each { |f| require f }
 Dir["#{__dir__}/twig/token_parser/*.rb"].each { |f| require f }
 Dir["#{__dir__}/twig/sandbox/*.rb"].each { |f| require f }
-
-if defined? Tilt
-  require 'tilt/twig_template2'
-  Tilt.register Tilt::TwigTemplate2, 'twig'
-  # Tilt.register_lazy 'Tilt::TwigTemplate', 'tilt/twig_template', 'twig'
-end
