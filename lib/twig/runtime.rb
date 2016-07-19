@@ -466,13 +466,10 @@ module Twig
     #
     #  @return array The keys
     def self.twig_get_array_keys_filter(array)
-      if array.is_a?(Traversable)
-        return array_keys(iterator_to_array(array))
+      if array.respond_to?(:keys)
+        return array.keys
       end
-      unless is_array(array)
-        return []
-      end
-      array_keys(array)
+      return []
     end
 
     #  Reverses a variable.
