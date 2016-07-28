@@ -56,6 +56,10 @@ module Twig
       @loop.set_attribute(:ifexpr, get_attribute(:ifexpr))
 
       compiler.
+        write("if _context['_seq'].respond_to?(:each)\n").
+        indent
+
+      compiler.
         write("_context['_seq'].each do |_loop_var|\n").
         indent.
         write('')
@@ -68,6 +72,10 @@ module Twig
         subcompile(get_node(:value_target)).
         raw(" = _loop_var\n").
         subcompile(get_node(:body)).
+        outdent.
+        write("end\n")
+
+      compiler.
         outdent.
         write("end\n")
 
